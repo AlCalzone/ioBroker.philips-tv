@@ -1,0 +1,61 @@
+{
+    "common": {
+        "name": "philips-tv",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "Initial release",
+                "de": "Initiale Version"
+            }
+        },
+        "title": "Philips TV",
+        "desc": {
+            "en": "Controls Philips TVs over the network",
+            "de": "Steuert Philips Fernseher über das Netzwerk"
+        },
+        "authors": [
+            "AlCalzone <d.griesel@gmx.net>"
+        ],
+        "platform": "Javascript/Node.js",
+        "mode": "daemon",
+        "icon": "tradfri.png",
+        "enabled": false,
+        "extIcon": "https://raw.githubusercontent.com/AlCalzone/ioBroker.philips-tv/master/admin/philips-tv.png",
+        "keywords": [
+            "philips",
+            "tv",
+            "remote"
+        ],
+        "readme": "https://github.com/AlCalzone/ioBroker.philips-tv/blob/master/README.md",
+        "loglevel": "info",
+        "type": "media",
+        "messagebox": true
+    },
+    "native": {
+        "host": ""
+    },
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Adapter-Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Whether the adapter is connected to the TV",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
+    ]
+}

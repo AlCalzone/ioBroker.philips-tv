@@ -1,0 +1,14 @@
+/.idea
+/node_modules
+/nbproject
+npm-debug.log
+/.vs
+
+# NYC coverage files
+coverage
+.nyc*
+
+# Compiled test files
+build/**/*.test.js
+build/**/*.test.d.ts
+build/**/*.test.js.map

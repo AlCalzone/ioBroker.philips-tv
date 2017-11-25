@@ -1,0 +1,27 @@
+{
+    "compileOnSave": true,          // Automatically build files in Visual Studio (Code), in combination with the watch option
+    "compilerOptions": {
+        "declaration": true,        // emit d.ts files
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noEmitOnError": true,     // dont compile faulty code
+        "noImplicitAny": false,     // set to true for stricter type checking
+        "outDir": "build/",
+        "removeComments": false,
+
+        // "noUnusedLocals": true,
+        // "noUnusedParameters": true,
+        
+        "sourceMap": false,
+        "inlineSourceMap": false,
+        //"sourceRoot": "src/",
+        "target": "es5"
+        //"watch": true
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "admin/**/*.ts"
+    ]
+}

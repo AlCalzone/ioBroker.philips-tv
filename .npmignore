@@ -1,0 +1,20 @@
+Gruntfile.js
+tasks
+node_modules
+.idea
+.git
+/node_modules
+.travis.yml
+appveyor.yml
+/src
+
+# NYC coverage files
+coverage
+.nyc*
+
+# test files
+test
+src/**/*.test.ts
+build/**/*.test.js
+build/**/*.test.d.ts
+build/**/*.test.map
