@@ -28,7 +28,7 @@
         ],
         "readme": "https://github.com/AlCalzone/ioBroker.philips-tv/blob/master/README.md",
         "loglevel": "info",
-        "type": "media",
+        "type": "multimedia",
         "messagebox": true
     },
     "native": {
