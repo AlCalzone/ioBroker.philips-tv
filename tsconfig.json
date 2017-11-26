@@ -15,7 +15,8 @@
         "sourceMap": false,
         "inlineSourceMap": false,
         //"sourceRoot": "src/",
-        "target": "es5"
+        "target": "es5",
+        "lib": [ "es6" ]
         //"watch": true
     },
     "include": [

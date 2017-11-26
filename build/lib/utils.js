@@ -53,4 +53,3 @@ exports.default = {
     getConfig: getConfig,
     adapter: adapter,
 };
-//# sourceMappingURL=utils.js.map
