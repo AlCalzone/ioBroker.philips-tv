@@ -49,7 +49,7 @@ var hostname;
 var requestPrefix;
 // Adapter-Objekt erstellen
 var adapter = utils_1.default.adapter({
-    name: "tradfri",
+    name: "philips-tv",
     // Wird aufgerufen, wenn Adapter initialisiert wird
     ready: function () { return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_a) {

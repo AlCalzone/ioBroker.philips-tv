@@ -17,7 +17,7 @@ let requestPrefix: string;
 
 // Adapter-Objekt erstellen
 let adapter: ExtendedAdapter = utils.adapter({
-	name: "tradfri",
+	name: "philips-tv",
 
 	// Wird aufgerufen, wenn Adapter initialisiert wird
 	ready: async () => {
