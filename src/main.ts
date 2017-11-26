@@ -46,8 +46,7 @@ let adapter: ExtendedAdapter = utils.adapter({
 		adapter.subscribeStates(`${adapter.namespace}.*`);
 		adapter.subscribeObjects(`${adapter.namespace}.*`);
 
-		pingTimer = setInterval(pingThread, 10000);
-		pingThread();
+		setImmediate(pingThread);
 
 	},
 
@@ -87,7 +86,32 @@ let adapter: ExtendedAdapter = utils.adapter({
 			// our own state was changed from within ioBroker, react to it
 
 			const stateObj = objects.get(id);
-			// TODO
+			let wasAcked: boolean = false;
+			let endpoint: string;
+			let payload: any;
+			if (/\.muted$/.test(id)) {
+				// mute/unmute the TV
+				endpoint = "audio/volume";
+				payload = { muted: state.val };
+			} else if (/\.volume$/.test(id)) {
+				// change the volume
+				endpoint = "audio/volume";
+				payload = { current: state.val };
+			}
+
+			if (endpoint != null && payload != null) {
+				try {
+					const result = await POST(endpoint, payload);
+					wasAcked = (result != null) && (result.indexOf("Ok") > -1);
+				} catch (e) {
+					_.log(`Error handling state change ${id} => ${state.val}: ${e.message}`, "error");
+				}
+
+				// ACK the state if necessary
+				if (wasAcked) {
+					await adapter.$setState(id, state, true);
+				}
+			}
 		} else if (!state) {
 			// TODO: find out what to do when states are deleted
 		}
@@ -98,7 +122,7 @@ let adapter: ExtendedAdapter = utils.adapter({
 		// is called when adapter shuts down - callback has to be called under any circumstances!
 		try {
 			// stop pinging
-			if (pingTimer != null) clearInterval(pingTimer);
+			if (pingTimer != null) clearTimeout(pingTimer);
 
 			// close the connection
 			adapter.setState("info.connection", false, true);
@@ -110,11 +134,11 @@ let adapter: ExtendedAdapter = utils.adapter({
 	},
 }) as ExtendedAdapter;
 
-async function GET(path: string): Promise<object> {
+async function GET(path: string): Promise<any> {
 	return request(`${requestPrefix}${path}`);
 }
 
-async function POST(path: string, jsonPayload: object): Promise<string> {
+async function POST(path: string, jsonPayload: any): Promise<string> {
 	return request({
 		uri: `${requestPrefix}${path}`,
 		method: "POST",
@@ -136,9 +160,62 @@ async function checkConnection(): Promise<boolean> {
 	}
 }
 
-async function poll() {
+/**
+ * Requests information from the TV. Has to be called periodically.
+ */
+async function poll(): Promise<void> {
 	// TODO
+	await Promise.all([
+		requestAudio(),
+	]);
 }
+
+async function requestAudio() {
+	try {
+		const result = JSON.parse(await GET("audio/volume"));
+
+		// update muted state
+		await extendObject("muted", { // alive state
+			type: "state",
+			common: {
+				name: "muted",
+				read: true,
+				write: true,
+				type: "boolean",
+				role: "value.muted",
+				desc: "Indicates if the TV is muted",
+			},
+			native: { },
+		});
+		await adapter.$setStateChanged(`${adapter.namespace}.muted`, result.muted, true);
+
+		// update volume state
+		await extendObject("volume", { // alive state
+			type: "state",
+			common: {
+				name: "volume",
+				read: true,
+				write: true,
+				type: "number",
+				min: result.min,
+				max: result.max,
+				role: "value.volume",
+			},
+			native: { },
+		});
+		await adapter.$setStateChanged(`${adapter.namespace}.volume`, result.current, true);
+	} catch (e) { /* it's ok */ }
+}
+
+async function extendObject(objId: string, obj: ioBroker.Object) {
+	const oldObj = await adapter.$getObject(objId);
+	const newObj = Object.assign(Object.assign({}, oldObj), obj);
+	if (JSON.stringify(newObj) !== JSON.stringify(oldObj)) {
+		await adapter.$setObject(objId, newObj);
+	}
+}
+
+// ========================================
 
 // Connection check
 let pingTimer: NodeJS.Timer;
@@ -153,16 +230,18 @@ async function pingThread() {
 	if (connectionAlive) {
 		if (!oldValue) {
 			// connection is now alive again
-			_.log(`The TV with host ${hostname} was turned on.`, "info");
+			_.log(`The TV with host ${hostname} is now reachable.`, "info");
 		}
 		// update information
-		poll();
+		await poll();
 	} else {
 		if (oldValue) {
 			// connection is now dead
-			_.log(`The TV with host ${hostname} was turned off.`, "info");
+			_.log(`The TV with host ${hostname} is not reachable anymore.`, "info");
 		}
 	}
+
+	pingTimer = setTimeout(pingThread, 10000);
 }
 
 // Unbehandelte Fehler tracen

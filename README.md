@@ -11,8 +11,8 @@ http://jointspace.sourceforge.net/projectdata/documentation/jasonApi/1/doc/API.h
 
 ## Changelog
 
-#### 0.0.1
-* (AlCalzone) not ready yet!
+#### 0.1.0
+* (AlCalzone) Initial release
 
 ## License
 The MIT License (MIT)

@@ -81,8 +81,7 @@ var adapter = utils_1.default.adapter({
                     // watch own states
                     adapter.subscribeStates(adapter.namespace + ".*");
                     adapter.subscribeObjects(adapter.namespace + ".*");
-                    pingTimer = setInterval(pingThread, 10000);
-                    pingThread();
+                    setImmediate(pingThread);
                     return [2 /*return*/];
             }
         });
@@ -108,22 +107,58 @@ var adapter = utils_1.default.adapter({
         }
     },
     stateChange: function (id, state) { return __awaiter(_this, void 0, void 0, function () {
-        var stateObj;
+        var stateObj, wasAcked, endpoint, payload, result, e_1;
         return __generator(this, function (_a) {
-            if (state) {
-                global_1.Global.log("{{blue}} state with id " + id + " updated: ack=" + state.ack + "; val=" + state.val, "debug");
+            switch (_a.label) {
+                case 0:
+                    if (state) {
+                        global_1.Global.log("{{blue}} state with id " + id + " updated: ack=" + state.ack + "; val=" + state.val, "debug");
+                    }
+                    else {
+                        global_1.Global.log("{{blue}} state with id " + id + " deleted", "debug");
+                    }
+                    if (!(state && !state.ack && id.startsWith(adapter.namespace))) return [3 /*break*/, 7];
+                    stateObj = objects.get(id);
+                    wasAcked = false;
+                    endpoint = void 0;
+                    payload = void 0;
+                    if (/\.muted$/.test(id)) {
+                        // mute/unmute the TV
+                        endpoint = "audio/volume";
+                        payload = { muted: state.val };
+                    }
+                    else if (/\.volume$/.test(id)) {
+                        // change the volume
+                        endpoint = "audio/volume";
+                        payload = { current: state.val };
+                    }
+                    if (!(endpoint != null && payload != null)) return [3 /*break*/, 6];
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, POST(endpoint, payload)];
+                case 2:
+                    result = _a.sent();
+                    wasAcked = (result != null) && (result.indexOf("Ok") > -1);
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_1 = _a.sent();
+                    global_1.Global.log("Error handling state change " + id + " => " + state.val + ": " + e_1.message, "error");
+                    return [3 /*break*/, 4];
+                case 4:
+                    if (!wasAcked) return [3 /*break*/, 6];
+                    return [4 /*yield*/, adapter.$setState(id, state, true)];
+                case 5:
+                    _a.sent();
+                    _a.label = 6;
+                case 6: return [3 /*break*/, 8];
+                case 7:
+                    if (!state) {
+                        // TODO: find out what to do when states are deleted
+                    }
+                    _a.label = 8;
+                case 8: return [2 /*return*/];
             }
-            else {
-                global_1.Global.log("{{blue}} state with id " + id + " deleted", "debug");
-            }
-            if (state && !state.ack && id.startsWith(adapter.namespace)) {
-                stateObj = objects.get(id);
-                // TODO
-            }
-            else if (!state) {
-                // TODO: find out what to do when states are deleted
-            }
-            return [2 /*return*/];
         });
     }); },
     unload: function (callback) {
@@ -131,7 +166,7 @@ var adapter = utils_1.default.adapter({
         try {
             // stop pinging
             if (pingTimer != null)
-                clearInterval(pingTimer);
+                clearTimeout(pingTimer);
             // close the connection
             adapter.setState("info.connection", false, true);
             callback();
@@ -164,7 +199,7 @@ function POST(path, jsonPayload) {
  */
 function checkConnection() {
     return __awaiter(this, void 0, void 0, function () {
-        var e_1;
+        var e_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -178,20 +213,112 @@ function checkConnection() {
                     _a.sent();
                     return [2 /*return*/, true];
                 case 2:
-                    e_1 = _a.sent();
+                    e_2 = _a.sent();
                     return [2 /*return*/, false];
                 case 3: return [2 /*return*/];
             }
         });
     });
 }
+/**
+ * Requests information from the TV. Has to be called periodically.
+ */
 function poll() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0: 
+                // TODO
+                return [4 /*yield*/, Promise.all([
+                        requestAudio(),
+                    ])];
+                case 1:
+                    // TODO
+                    _a.sent();
+                    return [2 /*return*/];
+            }
         });
     });
 }
+function requestAudio() {
+    return __awaiter(this, void 0, void 0, function () {
+        var result, _a, _b, e_3;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    _c.trys.push([0, 6, , 7]);
+                    _b = (_a = JSON).parse;
+                    return [4 /*yield*/, GET("audio/volume")];
+                case 1:
+                    result = _b.apply(_a, [_c.sent()]);
+                    // update muted state
+                    return [4 /*yield*/, extendObject("muted", {
+                            type: "state",
+                            common: {
+                                name: "muted",
+                                read: true,
+                                write: true,
+                                type: "boolean",
+                                role: "value.muted",
+                                desc: "Indicates if the TV is muted",
+                            },
+                            native: {},
+                        })];
+                case 2:
+                    // update muted state
+                    _c.sent();
+                    return [4 /*yield*/, adapter.$setStateChanged(adapter.namespace + ".muted", result.muted, true)];
+                case 3:
+                    _c.sent();
+                    // update volume state
+                    return [4 /*yield*/, extendObject("volume", {
+                            type: "state",
+                            common: {
+                                name: "volume",
+                                read: true,
+                                write: true,
+                                type: "number",
+                                min: result.min,
+                                max: result.max,
+                                role: "value.volume",
+                            },
+                            native: {},
+                        })];
+                case 4:
+                    // update volume state
+                    _c.sent();
+                    return [4 /*yield*/, adapter.$setStateChanged(adapter.namespace + ".volume", result.current, true)];
+                case 5:
+                    _c.sent();
+                    return [3 /*break*/, 7];
+                case 6:
+                    e_3 = _c.sent();
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
+            }
+        });
+    });
+}
+function extendObject(objId, obj) {
+    return __awaiter(this, void 0, void 0, function () {
+        var oldObj, newObj;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, adapter.$getObject(objId)];
+                case 1:
+                    oldObj = _a.sent();
+                    newObj = Object.assign(Object.assign({}, oldObj), obj);
+                    if (!(JSON.stringify(newObj) !== JSON.stringify(oldObj))) return [3 /*break*/, 3];
+                    return [4 /*yield*/, adapter.$setObject(objId, newObj)];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+// ========================================
 // Connection check
 var pingTimer;
 var connectionAlive = false;
@@ -208,21 +335,25 @@ function pingThread() {
                     return [4 /*yield*/, adapter.$setStateChanged("info.connection", connectionAlive, true)];
                 case 2:
                     _a.sent();
-                    // see if the connection state has changed
-                    if (connectionAlive) {
-                        if (!oldValue) {
-                            // connection is now alive again
-                            global_1.Global.log("The TV with host " + hostname + " was turned on.", "info");
-                        }
-                        // update information
-                        poll();
+                    if (!connectionAlive) return [3 /*break*/, 4];
+                    if (!oldValue) {
+                        // connection is now alive again
+                        global_1.Global.log("The TV with host " + hostname + " is now reachable.", "info");
                     }
-                    else {
-                        if (oldValue) {
-                            // connection is now dead
-                            global_1.Global.log("The TV with host " + hostname + " was turned off.", "info");
-                        }
+                    // update information
+                    return [4 /*yield*/, poll()];
+                case 3:
+                    // update information
+                    _a.sent();
+                    return [3 /*break*/, 5];
+                case 4:
+                    if (oldValue) {
+                        // connection is now dead
+                        global_1.Global.log("The TV with host " + hostname + " is not reachable anymore.", "info");
                     }
+                    _a.label = 5;
+                case 5:
+                    pingTimer = setTimeout(pingThread, 10000);
                     return [2 /*return*/];
             }
         });
