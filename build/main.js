@@ -132,6 +132,11 @@ var adapter = utils_1.default.adapter({
                         endpoint = "audio/volume";
                         payload = { current: state.val };
                     }
+                    else if (/\.pressKey$/.test(id)) {
+                        // send a key press to the TV
+                        endpoint = "input/key";
+                        payload = { key: state.val };
+                    }
                     if (!(endpoint != null && payload != null)) return [3 /*break*/, 6];
                     _a.label = 1;
                 case 1:

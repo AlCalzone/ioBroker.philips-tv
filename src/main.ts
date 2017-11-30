@@ -97,6 +97,10 @@ let adapter: ExtendedAdapter = utils.adapter({
 				// change the volume
 				endpoint = "audio/volume";
 				payload = { current: state.val };
+			} else if (/\.pressKey$/.test(id)) {
+				// send a key press to the TV
+				endpoint = "input/key";
+				payload = { key: state.val };
 			}
 
 			if (endpoint != null && payload != null) {
