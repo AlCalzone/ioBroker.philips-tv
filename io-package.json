@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "philips-tv",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "news": {
+            "0.2.0": {
+                "en": "Support sending key presses",
+                "de": "Senden von Tastendrücken unterstützt"
+            },
             "0.1.0": {
                 "en": "Initial release",
                 "de": "Initiale Version"
