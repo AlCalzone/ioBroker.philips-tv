@@ -1,6 +1,6 @@
 {
   "name": "iobroker.philips-tv",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "ioBroker adapter to control Philips TVs over the network",
   "author": {
     "name": "AlCalzone",
@@ -29,26 +29,26 @@
     "request-promise-native": "^1.0.5"
   },
   "devDependencies": {
-    "@types/chai": "^4.0.4",
+    "@types/chai": "^4.0.6",
     "@types/chai-as-promised": "^7.1.0",
-    "@types/mocha": "^2.2.43",
+    "@types/mocha": "^2.2.44",
     "@types/node": "^6.0.88",
     "@types/request": "^2.0.8",
     "@types/request-promise-native": "^1.0.10",
-    "@types/sinon": "^2.3.6",
+    "@types/sinon": "^4.0.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "mocha": "^4.0.0",
+    "mocha": "^4.0.1",
     "node-ssh": "^5.0.0",
-    "nyc": "^11.2.1",
+    "nyc": "^11.3.0",
     "semver": "^5.4.1",
-    "sinon": "^4.0.1",
+    "sinon": "^4.1.2",
     "source-map-support": "^0.5.0",
-    "ts-loader": "^2.3.7",
+    "ts-loader": "^3.2.0",
     "ts-node": "^3.3.0",
-    "tslint": "^5.7.0",
-    "typescript": "^2.5.3",
-    "webpack": "^3.6.0"
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2",
+    "webpack": "^3.8.1"
   },
   "main": "build/main.js",
   "scripts": {

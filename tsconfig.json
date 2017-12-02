@@ -23,6 +23,7 @@
         "src/**/*.ts"
     ],
     "exclude": [
-        "admin/**/*.ts"
+        "admin/**/*.ts",
+        "src/**/*.test.ts"
     ]
 }
