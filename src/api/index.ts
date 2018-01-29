@@ -54,15 +54,21 @@ export abstract class API {
 
 	/** Whether this API is only usable after pairing */
 	public abstract get requiresPairing(): boolean;
+	/** Start a pairing process */
+	public abstract async startPairing(): Promise<void>;
 	/** Start a pairing process and return the required data to complete it */
-	public abstract async startPairing(): Promise<Record<string, any>>;
-	/** Start a pairing process and return the required data to complete it */
-	public abstract async finishPairing(pinCode: string, additionalInfo: Record<string, any>): Promise<Credentials>;
+	public abstract async finishPairing(pinCode: string): Promise<Credentials>;
 	/** Provides credentials from a previous pairing process */
 	public abstract provideCredentials(credentials: Credentials): void;
 
 	/** The prefix for all http requests */
 	protected requestPrefix: string;
+
+	private _params = new Map<string, any>();
+	/** Additional params that should be stored over several API uses */
+	public get params() {
+		return this._params;
+	}
 
 	/** Performs a GET request on the given resource and returns the result */
 	public async get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
@@ -73,12 +79,28 @@ export abstract class API {
 	}
 
 	/** Posts JSON data to the given resource and returns the result */
-	public async postJSON(path: string, jsonPayload: any): Promise<string> {
-		return request({
+	public async postJSONwithDigestAuth(path: string, credentials: Credentials, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
+		const reqOpts: OptionsWithUri = Object.assign(options, {
+			uri: `${this.requestPrefix}${path}`,
+			method: "POST",
+			json: jsonPayload,
+			auth: {
+				username: credentials.username,
+				password: credentials.password,
+				sendImmediately: false,
+			},
+		});
+		return request(reqOpts);
+	}
+
+	/** Posts JSON data to the given resource and returns the result */
+	public async postJSON(path: string, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
+		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: `${this.requestPrefix}${path}`,
 			method: "POST",
 			json: jsonPayload,
 		});
+		return request(reqOpts);
 	}
 
 }

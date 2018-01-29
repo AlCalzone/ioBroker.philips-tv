@@ -96,7 +96,7 @@ var APIv1 = /** @class */ (function (_super) {
     APIv1.prototype.startPairing = function () {
         throw new Error("APIv1 doesn't support pairing!");
     };
-    APIv1.prototype.finishPairing = function (pinCode, additionalInfo) {
+    APIv1.prototype.finishPairing = function (pinCode) {
         throw new Error("APIv1 doesn't support pairing!");
     };
     APIv1.prototype.provideCredentials = function (credentials) {

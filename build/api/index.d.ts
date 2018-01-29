@@ -22,16 +22,21 @@ export declare abstract class API {
     readonly abstract version: APIVersion;
     /** Whether this API is only usable after pairing */
     readonly abstract requiresPairing: boolean;
+    /** Start a pairing process */
+    abstract startPairing(): Promise<void>;
     /** Start a pairing process and return the required data to complete it */
-    abstract startPairing(): Promise<Record<string, any>>;
-    /** Start a pairing process and return the required data to complete it */
-    abstract finishPairing(pinCode: string, additionalInfo: Record<string, any>): Promise<Credentials>;
+    abstract finishPairing(pinCode: string): Promise<Credentials>;
     /** Provides credentials from a previous pairing process */
     abstract provideCredentials(credentials: Credentials): void;
     /** The prefix for all http requests */
     protected requestPrefix: string;
+    private _params;
+    /** Additional params that should be stored over several API uses */
+    readonly params: Map<string, any>;
     /** Performs a GET request on the given resource and returns the result */
     get(path: string, options?: RequestOptions): Promise<string | FullResponse>;
     /** Posts JSON data to the given resource and returns the result */
-    postJSON(path: string, jsonPayload: any): Promise<string>;
+    postJSONwithDigestAuth(path: string, credentials: Credentials, jsonPayload: any, options?: RequestOptions): Promise<string>;
+    /** Posts JSON data to the given resource and returns the result */
+    postJSON(path: string, jsonPayload: any, options?: RequestOptions): Promise<string>;
 }

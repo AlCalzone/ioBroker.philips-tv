@@ -49,6 +49,7 @@ var API = /** @class */ (function () {
         /** The hostname this wrapper is bound to */
         hostname) {
         this.hostname = hostname;
+        this._params = new Map();
     }
     API.prototype.create = function (hostname) {
         return __awaiter(this, void 0, void 0, function () {
@@ -80,6 +81,14 @@ var API = /** @class */ (function () {
             });
         });
     };
+    Object.defineProperty(API.prototype, "params", {
+        /** Additional params that should be stored over several API uses */
+        get: function () {
+            return this._params;
+        },
+        enumerable: true,
+        configurable: true
+    });
     /** Performs a GET request on the given resource and returns the result */
     API.prototype.get = function (path, options) {
         if (options === void 0) { options = {}; }
@@ -94,14 +103,37 @@ var API = /** @class */ (function () {
         });
     };
     /** Posts JSON data to the given resource and returns the result */
-    API.prototype.postJSON = function (path, jsonPayload) {
+    API.prototype.postJSONwithDigestAuth = function (path, credentials, jsonPayload, options) {
+        if (options === void 0) { options = {}; }
         return __awaiter(this, void 0, void 0, function () {
+            var reqOpts;
             return __generator(this, function (_a) {
-                return [2 /*return*/, request({
-                        uri: "" + this.requestPrefix + path,
-                        method: "POST",
-                        json: jsonPayload,
-                    })];
+                reqOpts = Object.assign(options, {
+                    uri: "" + this.requestPrefix + path,
+                    method: "POST",
+                    json: jsonPayload,
+                    auth: {
+                        username: credentials.username,
+                        password: credentials.password,
+                        sendImmediately: false,
+                    },
+                });
+                return [2 /*return*/, request(reqOpts)];
+            });
+        });
+    };
+    /** Posts JSON data to the given resource and returns the result */
+    API.prototype.postJSON = function (path, jsonPayload, options) {
+        if (options === void 0) { options = {}; }
+        return __awaiter(this, void 0, void 0, function () {
+            var reqOpts;
+            return __generator(this, function (_a) {
+                reqOpts = Object.assign(options, {
+                    uri: "" + this.requestPrefix + path,
+                    method: "POST",
+                    json: jsonPayload,
+                });
+                return [2 /*return*/, request(reqOpts)];
             });
         });
     };

@@ -45,9 +45,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var crypto = require("crypto");
 var index_1 = require("./index");
 // see https://github.com/suborb/philips_android_tv/blob/master/philips.py for pairing procedure
 var secret = Buffer.from("ZmVay1EQVFOaZhwQ4Kv81ypLAZNczV9sG4KkseXWn1NEk6cXmPKO/MCa9sryslvLCFMnNe4Z4CPXzToowvhHvA==", "base64");
+function sign(data) {
+    var hmac = crypto.createHmac("sha", secret);
+    hmac.update(data);
+    return hmac.digest();
+}
 var APIv6 = /** @class */ (function (_super) {
     __extends(APIv6, _super);
     function APIv6() {
@@ -87,19 +93,96 @@ var APIv6 = /** @class */ (function (_super) {
             });
         });
     };
+    /** Creates a new device id or retrieves a stored one */
+    APIv6.prototype.getDeviceID = function () {
+        if (this.params.has("deviceID"))
+            return this.params.get("deviceID");
+        // Generate a new ID
+        var chars = "abcdefghkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789";
+        var ret = "";
+        for (var i = 0; i < 16; i++) {
+            var index = Math.floor(Math.random() * chars.length);
+            ret += chars[index];
+        }
+        this.params.set("deviceID", ret);
+        return ret;
+    };
+    APIv6.prototype.getDeviceSpec = function () {
+        return {
+            device_id: this.getDeviceID(),
+            device_name: "heliotrope",
+            device_os: "Android",
+            app_name: "ApplicationName",
+            app_id: "app.id",
+            type: "native",
+        };
+    };
     Object.defineProperty(APIv6.prototype, "requiresPairing", {
         get: function () { return true; },
         enumerable: true,
         configurable: true
     });
     APIv6.prototype.startPairing = function () {
-        throw new Error("Method not implemented.");
+        return __awaiter(this, void 0, void 0, function () {
+            var requestPayload, response, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        requestPayload = {
+                            scope: ["read", "write", "control"],
+                            device: this.getDeviceSpec(),
+                        };
+                        _b = (_a = JSON).parse;
+                        return [4 /*yield*/, this.postJSON("pair/request", requestPayload)];
+                    case 1:
+                        response = _b.apply(_a, [_c.sent()]);
+                        this.pairingContext = {
+                            timestamp: response.timestamp,
+                            auth_key: response.auth_key,
+                            timeout: response.timeout,
+                        };
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
-    APIv6.prototype.finishPairing = function (pinCode, additionalInfo) {
-        throw new Error("Method not implemented.");
+    APIv6.prototype.finishPairing = function (pinCode) {
+        return __awaiter(this, void 0, void 0, function () {
+            var auth, requestPayload, credentials, response, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        if (this.pairingContext == null)
+                            throw new Error("No pairing process to finish!");
+                        auth = {
+                            auth_AppId: "1",
+                            pin: pinCode,
+                            auth_timestamp: this.pairingContext.timestamp,
+                            auth_signature: sign(Buffer.concat([
+                                secret,
+                                Buffer.from(this.pairingContext.timestamp, "utf8"),
+                                Buffer.from(pinCode, "utf8"),
+                            ])),
+                        };
+                        requestPayload = {
+                            auth: auth,
+                            device: this.getDeviceSpec(),
+                        };
+                        credentials = {
+                            username: this.getDeviceID(),
+                            password: this.pairingContext.auth_key,
+                        };
+                        _b = (_a = JSON).parse;
+                        return [4 /*yield*/, this.postJSONwithDigestAuth("pair/grant", credentials, requestPayload)];
+                    case 1:
+                        response = _b.apply(_a, [_c.sent()]);
+                        return [2 /*return*/, credentials];
+                }
+            });
+        });
     };
     APIv6.prototype.provideCredentials = function (credentials) {
-        throw new Error("Method not implemented.");
+        this.credentials = credentials;
     };
     return APIv6;
 }(index_1.API));

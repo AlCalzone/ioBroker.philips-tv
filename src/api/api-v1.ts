@@ -26,10 +26,10 @@ export class APIv1 extends API {
 
 	// APIv1 doesn't need pairing
 	public get requiresPairing(): boolean { return false; }
-	public startPairing(): Promise<Record<string, any>> {
+	public startPairing(): Promise<void> {
 		throw new Error("APIv1 doesn't support pairing!");
 	}
-	public finishPairing(pinCode: string, additionalInfo: Record<string, any>): Promise<Credentials> {
+	public finishPairing(pinCode: string): Promise<Credentials> {
 		throw new Error("APIv1 doesn't support pairing!");
 	}
 	public provideCredentials(credentials: Credentials): void {

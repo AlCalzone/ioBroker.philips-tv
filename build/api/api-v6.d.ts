@@ -4,8 +4,13 @@ export declare class APIv6 extends API {
     version: "v6";
     /** Tests if a given hostname supports this API version */
     protected test(): Promise<boolean>;
+    /** Creates a new device id or retrieves a stored one */
+    private getDeviceID();
+    private getDeviceSpec();
+    private pairingContext;
     readonly requiresPairing: boolean;
-    startPairing(): Promise<Record<string, any>>;
-    finishPairing(pinCode: string, additionalInfo: Record<string, any>): Promise<Credentials>;
+    startPairing(): Promise<void>;
+    finishPairing(pinCode: string): Promise<Credentials>;
+    private credentials;
     provideCredentials(credentials: Credentials): void;
 }

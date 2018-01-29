@@ -5,7 +5,7 @@ export declare class APIv1 extends API {
     /** Tests if a given hostname supports this API version */
     protected test(): Promise<boolean>;
     readonly requiresPairing: boolean;
-    startPairing(): Promise<Record<string, any>>;
-    finishPairing(pinCode: string, additionalInfo: Record<string, any>): Promise<Credentials>;
+    startPairing(): Promise<void>;
+    finishPairing(pinCode: string): Promise<Credentials>;
     provideCredentials(credentials: Credentials): void;
 }
