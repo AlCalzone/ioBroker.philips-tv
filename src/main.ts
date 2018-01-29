@@ -1,3 +1,7 @@
+// polyfill NodeJS 4 buffer functions
+// tslint:disable-next-line:no-var-requires
+require("buffer-v6-polyfill");
+
 import * as request from "request-promise-native";
 
 // Eigene Module laden

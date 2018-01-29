@@ -15,7 +15,7 @@ describe("module to test => function to test", () => {
 	const expected = 5;
 
 	it(`should return ${expected}`, () => {
-		let result = 5;
+		const result = 5;
 		// assign result a value from functionToTest
 		expect(result).to.equal(expected);
 	});

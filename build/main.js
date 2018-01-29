@@ -36,6 +36,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
+// polyfill NodeJS 4 buffer functions
+// tslint:disable-next-line:no-var-requires
+require("buffer-v6-polyfill");
 var request = require("request-promise-native");
 // Eigene Module laden
 var fix_objects_1 = require("./lib/fix-objects");

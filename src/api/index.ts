@@ -12,6 +12,11 @@ export type APIVersion =
 	| "v6"
 ;
 
+export interface Credentials {
+	username: string;
+	password: string;
+}
+
 /**
  * Common base class for all specialized APIs that support a range of devices
  */
@@ -46,6 +51,15 @@ export abstract class API {
 
 	/** Determines which API version this wrapper represents */
 	abstract get version(): APIVersion;
+
+	/** Whether this API is only usable after pairing */
+	public abstract get requiresPairing(): boolean;
+	/** Start a pairing process and return the required data to complete it */
+	public abstract async startPairing(): Promise<Record<string, any>>;
+	/** Start a pairing process and return the required data to complete it */
+	public abstract async finishPairing(pinCode: string, additionalInfo: Record<string, any>): Promise<Credentials>;
+	/** Provides credentials from a previous pairing process */
+	public abstract provideCredentials(credentials: Credentials): void;
 
 	/** The prefix for all http requests */
 	protected requestPrefix: string;

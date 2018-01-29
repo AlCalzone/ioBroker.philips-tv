@@ -1,5 +1,9 @@
 import { FullResponse } from "request-promise-native";
-import { API } from "./index";
+import { API, Credentials } from "./index";
+
+// see https://github.com/suborb/philips_android_tv/blob/master/philips.py for pairing procedure
+
+const secret = Buffer.from("ZmVay1EQVFOaZhwQ4Kv81ypLAZNczV9sG4KkseXWn1NEk6cXmPKO/MCa9sryslvLCFMnNe4Z4CPXzToowvhHvA==", "base64");
 
 export class APIv6 extends API {
 
@@ -26,6 +30,17 @@ export class APIv6 extends API {
 		} catch (e) {
 			return false;
 		}
+	}
+
+	public get requiresPairing(): boolean { return true; }
+	public startPairing(): Promise<Record<string, any>> {
+		throw new Error("Method not implemented.");
+	}
+	public finishPairing(pinCode: string, additionalInfo: Record<string, any>): Promise<Credentials> {
+		throw new Error("Method not implemented.");
+	}
+	public provideCredentials(credentials: Credentials): void {
+		throw new Error("Method not implemented.");
 	}
 
 }

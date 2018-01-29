@@ -1,4 +1,4 @@
-import { API } from "./index";
+import { API, Credentials } from "./index";
 
 export class APIv1 extends API {
 
@@ -22,6 +22,18 @@ export class APIv1 extends API {
 		} catch (e) {
 			return false;
 		}
+	}
+
+	// APIv1 doesn't need pairing
+	public get requiresPairing(): boolean { return false; }
+	public startPairing(): Promise<Record<string, any>> {
+		throw new Error("APIv1 doesn't support pairing!");
+	}
+	public finishPairing(pinCode: string, additionalInfo: Record<string, any>): Promise<Credentials> {
+		throw new Error("APIv1 doesn't support pairing!");
+	}
+	public provideCredentials(credentials: Credentials): void {
+		throw new Error("APIv1 doesn't support pairing!");
 	}
 
 }
