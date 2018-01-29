@@ -1,9 +1,7 @@
 import * as request from "request-promise-native";
 import { FullResponse, OptionsWithUri, RequestPromiseOptions as RequestOptions } from "request-promise-native";
-import { APIv1 } from "./api-v1";
-import { APIv5 } from "./api-v5";
-import { APIv6 } from "./api-v6";
-export { APIv1 } from "./api-v1";
+
+import { ExtendedAdapter, Global as _ } from "../lib/global";
 
 export type APIVersion =
 	"unknown"
@@ -34,13 +32,19 @@ export abstract class API {
 			if (!await api.checkConnection()) throw new Error(`No connection to host ${hostname}`);
 		}
 
+		_.log("detecting API version", "debug");
+
 		for (const apiType of [APIv1, APIv5, APIv6]) {
+			_.log("testing " + apiType.name, "debug");
 			ret = new apiType(hostname);
 			await ensureConnection(ret);
-			if (await ret.test()) return ret;
+			if (await ret.test()) {
+				_.log(`TV has ${apiType.name}`, "debug");
+				return ret;
+			}
 		}
 
-		throw new Error(`No supported device found at "${hostname}"`);
+		throw new Error(`No supported device/API version found at "${hostname}"`);
 	}
 
 	/** Tests if a given hostname supports this API version */
@@ -68,7 +72,7 @@ export abstract class API {
 	}
 
 	/** Performs a GET request on the given resource and returns the result */
-	public async get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
+	public get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: `${this.requestPrefix}${path}`,
 		});
@@ -76,7 +80,7 @@ export abstract class API {
 	}
 
 	/** Performs a GET request on the given resource and returns the result */
-	public async getWithDigestAuth(path: string, credentials: Credentials, options: RequestOptions = {}): Promise<string | FullResponse> {
+	public getWithDigestAuth(path: string, credentials: Credentials, options: RequestOptions = {}): Promise<string | FullResponse> {
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: `${this.requestPrefix}${path}`,
 			auth: {
@@ -89,7 +93,7 @@ export abstract class API {
 	}
 
 	/** Posts JSON data to the given resource and returns the result */
-	public async postJSONwithDigestAuth(path: string, credentials: Credentials, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
+	public postJSONwithDigestAuth(path: string, credentials: Credentials, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: `${this.requestPrefix}${path}`,
 			method: "POST",
@@ -104,7 +108,7 @@ export abstract class API {
 	}
 
 	/** Posts JSON data to the given resource and returns the result */
-	public async postJSON(path: string, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
+	public postJSON(path: string, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: `${this.requestPrefix}${path}`,
 			method: "POST",
@@ -115,16 +119,25 @@ export abstract class API {
 
 	/** Checks if the configured host is reachable */
 	public async checkConnection(): Promise<boolean> {
+		_.log("checking if connection is alive", "debug");
 		try {
 			// audio/volume has only a little data,
 			// so we use that path to check the connection
 			await this.get("", {
 				timeout: 5000, // don't wait forever
+				simple: false, // connection is successful even with an error status code
 			});
+			_.log("connection is ALIVE", "debug");
 			return true;
 		} catch (e) {
+			_.log("connection is DEAD. reason: " + e.message, "debug");
 			return false;
 		}
 	}
 
 }
+
+// has to be imported here or TypeScript chokes
+import { APIv1 } from "./api-v1";
+import { APIv5 } from "./api-v5";
+import { APIv6 } from "./api-v6";

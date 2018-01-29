@@ -306,6 +306,7 @@ function pingThread() {
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
+                    adapter.log.debug("initializing connection to " + hostname);
                     return [4 /*yield*/, index_1.API.create(hostname)];
                 case 2:
                     api = _a.sent();
@@ -318,6 +319,7 @@ function pingThread() {
                     return [3 /*break*/, 4];
                 case 3:
                     e_3 = _a.sent();
+                    adapter.log.debug("Could not initialize connection. Reason: " + e_3.message);
                     connectionAlive = false;
                     return [3 /*break*/, 4];
                 case 4: return [3 /*break*/, 7];

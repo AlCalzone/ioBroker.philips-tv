@@ -1,6 +1,5 @@
 /// <reference types="request-promise-native" />
 import { FullResponse, RequestPromiseOptions as RequestOptions } from "request-promise-native";
-export { APIv1 } from "./api-v1";
 export declare type APIVersion = "unknown" | "v1" | "v5" | "v6";
 export interface Credentials {
     username: string;

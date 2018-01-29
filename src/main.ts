@@ -221,6 +221,7 @@ async function pingThread() {
 	// if this is the first time connecting to the TV, determine the API version
 	if (api == null) {
 		try {
+			adapter.log.debug(`initializing connection to ${hostname}`);
 			api = await API.create(hostname);
 			// check if we need credentials and also have them
 			if (api.requiresPairing && (credentials.username === "" || credentials.password === "")) {
@@ -229,6 +230,7 @@ async function pingThread() {
 			}
 			connectionAlive = true;
 		} catch (e) {
+			adapter.log.debug(`Could not initialize connection. Reason: ${e.message}`);
 			connectionAlive = false;
 		}
 	} else {

@@ -36,11 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var request = require("request-promise-native");
-var api_v1_1 = require("./api-v1");
-var api_v5_1 = require("./api-v5");
-var api_v6_1 = require("./api-v6");
-var api_v1_2 = require("./api-v1");
-exports.APIv1 = api_v1_2.APIv1;
+var global_1 = require("../lib/global");
 /**
  * Common base class for all specialized APIs that support a range of devices
  */
@@ -70,24 +66,28 @@ var API = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
+                        global_1.Global.log("detecting API version", "debug");
                         _i = 0, _a = [api_v1_1.APIv1, api_v5_1.APIv5, api_v6_1.APIv6];
                         _b.label = 1;
                     case 1:
                         if (!(_i < _a.length)) return [3 /*break*/, 5];
                         apiType = _a[_i];
+                        global_1.Global.log("testing " + apiType.name, "debug");
                         ret = new apiType(hostname);
                         return [4 /*yield*/, ensureConnection(ret)];
                     case 2:
                         _b.sent();
                         return [4 /*yield*/, ret.test()];
                     case 3:
-                        if (_b.sent())
+                        if (_b.sent()) {
+                            global_1.Global.log("TV has " + apiType.name, "debug");
                             return [2 /*return*/, ret];
+                        }
                         _b.label = 4;
                     case 4:
                         _i++;
                         return [3 /*break*/, 1];
-                    case 5: throw new Error("No supported device found at \"" + hostname + "\"");
+                    case 5: throw new Error("No supported device/API version found at \"" + hostname + "\"");
                 }
             });
         });
@@ -103,68 +103,48 @@ var API = /** @class */ (function () {
     /** Performs a GET request on the given resource and returns the result */
     API.prototype.get = function (path, options) {
         if (options === void 0) { options = {}; }
-        return __awaiter(this, void 0, void 0, function () {
-            var reqOpts;
-            return __generator(this, function (_a) {
-                reqOpts = Object.assign(options, {
-                    uri: "" + this.requestPrefix + path,
-                });
-                return [2 /*return*/, request(reqOpts)];
-            });
+        var reqOpts = Object.assign(options, {
+            uri: "" + this.requestPrefix + path,
         });
+        return request(reqOpts);
     };
     /** Performs a GET request on the given resource and returns the result */
     API.prototype.getWithDigestAuth = function (path, credentials, options) {
         if (options === void 0) { options = {}; }
-        return __awaiter(this, void 0, void 0, function () {
-            var reqOpts;
-            return __generator(this, function (_a) {
-                reqOpts = Object.assign(options, {
-                    uri: "" + this.requestPrefix + path,
-                    auth: {
-                        username: credentials.username,
-                        password: credentials.password,
-                        sendImmediately: false,
-                    },
-                });
-                return [2 /*return*/, request(reqOpts)];
-            });
+        var reqOpts = Object.assign(options, {
+            uri: "" + this.requestPrefix + path,
+            auth: {
+                username: credentials.username,
+                password: credentials.password,
+                sendImmediately: false,
+            },
         });
+        return request(reqOpts);
     };
     /** Posts JSON data to the given resource and returns the result */
     API.prototype.postJSONwithDigestAuth = function (path, credentials, jsonPayload, options) {
         if (options === void 0) { options = {}; }
-        return __awaiter(this, void 0, void 0, function () {
-            var reqOpts;
-            return __generator(this, function (_a) {
-                reqOpts = Object.assign(options, {
-                    uri: "" + this.requestPrefix + path,
-                    method: "POST",
-                    json: jsonPayload,
-                    auth: {
-                        username: credentials.username,
-                        password: credentials.password,
-                        sendImmediately: false,
-                    },
-                });
-                return [2 /*return*/, request(reqOpts)];
-            });
+        var reqOpts = Object.assign(options, {
+            uri: "" + this.requestPrefix + path,
+            method: "POST",
+            json: jsonPayload,
+            auth: {
+                username: credentials.username,
+                password: credentials.password,
+                sendImmediately: false,
+            },
         });
+        return request(reqOpts);
     };
     /** Posts JSON data to the given resource and returns the result */
     API.prototype.postJSON = function (path, jsonPayload, options) {
         if (options === void 0) { options = {}; }
-        return __awaiter(this, void 0, void 0, function () {
-            var reqOpts;
-            return __generator(this, function (_a) {
-                reqOpts = Object.assign(options, {
-                    uri: "" + this.requestPrefix + path,
-                    method: "POST",
-                    json: jsonPayload,
-                });
-                return [2 /*return*/, request(reqOpts)];
-            });
+        var reqOpts = Object.assign(options, {
+            uri: "" + this.requestPrefix + path,
+            method: "POST",
+            json: jsonPayload,
         });
+        return request(reqOpts);
     };
     /** Checks if the configured host is reachable */
     API.prototype.checkConnection = function () {
@@ -173,21 +153,27 @@ var API = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
+                        global_1.Global.log("checking if connection is alive", "debug");
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
                         // audio/volume has only a little data,
                         // so we use that path to check the connection
                         return [4 /*yield*/, this.get("", {
                                 timeout: 5000,
+                                simple: false,
                             })];
-                    case 1:
+                    case 2:
                         // audio/volume has only a little data,
                         // so we use that path to check the connection
                         _a.sent();
+                        global_1.Global.log("connection is ALIVE", "debug");
                         return [2 /*return*/, true];
-                    case 2:
+                    case 3:
                         e_1 = _a.sent();
+                        global_1.Global.log("connection is DEAD. reason: " + e_1.message, "debug");
                         return [2 /*return*/, false];
-                    case 3: return [2 /*return*/];
+                    case 4: return [2 /*return*/];
                 }
             });
         });
@@ -195,3 +181,7 @@ var API = /** @class */ (function () {
     return API;
 }());
 exports.API = API;
+// has to be imported here or TypeScript chokes
+var api_v1_1 = require("./api-v1");
+var api_v5_1 = require("./api-v5");
+var api_v6_1 = require("./api-v6");
