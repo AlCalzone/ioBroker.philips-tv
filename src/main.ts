@@ -5,6 +5,7 @@ require("buffer-v6-polyfill");
 import * as request from "request-promise-native";
 
 // Eigene Module laden
+import { API, Credentials } from "./api/index";
 import { ensureInstanceObjects } from "./lib/fix-objects";
 import { ExtendedAdapter, Global as _ } from "./lib/global";
 import { composeObject, DictionaryLike, entries, values } from "./lib/object-polyfill";
@@ -16,8 +17,9 @@ import utils from "./lib/utils";
 // Objekte verwalten
 const objects = new Map<string, ioBroker.Object>();
 
+let api: API;
 let hostname: string;
-let requestPrefix: string;
+let credentials: Credentials;
 
 // Adapter-Objekt erstellen
 let adapter: ExtendedAdapter = utils.adapter({
@@ -39,12 +41,16 @@ let adapter: ExtendedAdapter = utils.adapter({
 		// Sicherstellen, dass die Optionen vollständig ausgefüllt sind.
 		if (adapter.config && adapter.config.host != null && adapter.config.host !== "") {
 			// alles gut
+			hostname = adapter.config.host;
 		} else {
 			adapter.log.error("Please set the connection params in the adapter options before starting the adapter!");
 			return;
 		}
-		hostname = (adapter.config.host as string).toLowerCase();
-		requestPrefix = `http://${hostname}:1925/1/`;
+
+		credentials = {
+			username: adapter.config.username || "",
+			password: adapter.config.password || "",
+		};
 
 		// watch own states
 		adapter.subscribeStates(`${adapter.namespace}.*`);
@@ -89,6 +95,11 @@ let adapter: ExtendedAdapter = utils.adapter({
 		if (state && !state.ack && id.startsWith(adapter.namespace)) {
 			// our own state was changed from within ioBroker, react to it
 
+			if (!connectionAlive) {
+				adapter.log.warn(`Not connected to the TV - can't handle state change ${id}`);
+				return;
+			}
+
 			const stateObj = objects.get(id);
 			let wasAcked: boolean = false;
 			let endpoint: string;
@@ -109,7 +120,7 @@ let adapter: ExtendedAdapter = utils.adapter({
 
 			if (endpoint != null && payload != null) {
 				try {
-					const result = await POST(endpoint, payload);
+					const result = await api.postJSON(endpoint, payload);
 					wasAcked = (result != null) && (result.indexOf("Ok") > -1);
 				} catch (e) {
 					_.log(`Error handling state change ${id} => ${state.val}: ${e.message}`, "error");
@@ -142,32 +153,6 @@ let adapter: ExtendedAdapter = utils.adapter({
 	},
 }) as ExtendedAdapter;
 
-async function GET(path: string): Promise<any> {
-	return request(`${requestPrefix}${path}`);
-}
-
-async function POST(path: string, jsonPayload: any): Promise<string> {
-	return request({
-		uri: `${requestPrefix}${path}`,
-		method: "POST",
-		json: jsonPayload,
-	});
-}
-
-/**
- * Checks if the TV is reachable
- */
-async function checkConnection(): Promise<boolean> {
-	try {
-		// audio/volume has only a little data,
-		// so we use that path to check the connection
-		await GET("audio/volume");
-		return true;
-	} catch (e) {
-		return false;
-	}
-}
-
 /**
  * Requests information from the TV. Has to be called periodically.
  */
@@ -180,7 +165,7 @@ async function poll(): Promise<void> {
 
 async function requestAudio() {
 	try {
-		const result = JSON.parse(await GET("audio/volume"));
+		const result = JSON.parse(await api.get("audio/volume") as string);
 
 		// update muted state
 		await extendObject("muted", { // alive state
@@ -193,7 +178,7 @@ async function requestAudio() {
 				role: "value.muted",
 				desc: "Indicates if the TV is muted",
 			},
-			native: { },
+			native: {},
 		});
 		await adapter.$setStateChanged(`${adapter.namespace}.muted`, result.muted, true);
 
@@ -209,7 +194,7 @@ async function requestAudio() {
 				max: result.max,
 				role: "value.volume",
 			},
-			native: { },
+			native: {},
 		});
 		await adapter.$setStateChanged(`${adapter.namespace}.volume`, result.current, true);
 	} catch (e) { /* it's ok */ }
@@ -217,7 +202,7 @@ async function requestAudio() {
 
 async function extendObject(objId: string, obj: ioBroker.Object) {
 	const oldObj = await adapter.$getObject(objId);
-	const newObj = Object.assign(Object.assign({}, oldObj), obj);
+	const newObj = Object.assign({}, oldObj, obj);
 	if (JSON.stringify(newObj) !== JSON.stringify(oldObj)) {
 		await adapter.$setObject(objId, newObj);
 	}
@@ -230,22 +215,40 @@ let pingTimer: NodeJS.Timer;
 let connectionAlive: boolean = false;
 
 async function pingThread() {
+
 	const oldValue = connectionAlive;
-	connectionAlive = await checkConnection();
+
+	// if this is the first time connecting to the TV, determine the API version
+	if (api == null) {
+		try {
+			api = await API.create(hostname);
+			// check if we need credentials and also have them
+			if (api.requiresPairing && (credentials.username === "" || credentials.password === "")) {
+				adapter.log.warn(`The TV at ${hostname} needs to be paired before you can use the adapter. Go to the adapter config to continue!`);
+				return;
+			}
+			connectionAlive = true;
+		} catch (e) {
+			connectionAlive = false;
+		}
+	} else {
+		connectionAlive = await api.checkConnection();
+	}
+
 	await adapter.$setStateChanged("info.connection", connectionAlive, true);
 
 	// see if the connection state has changed
 	if (connectionAlive) {
 		if (!oldValue) {
 			// connection is now alive again
-			_.log(`The TV with host ${hostname} is now reachable.`, "info");
+			_.log(`The TV at ${hostname} is now reachable.`, "info");
 		}
 		// update information
 		await poll();
 	} else {
 		if (oldValue) {
 			// connection is now dead
-			_.log(`The TV with host ${hostname} is not reachable anymore.`, "info");
+			_.log(`The TV at ${hostname} is not reachable anymore.`, "info");
 		}
 	}
 

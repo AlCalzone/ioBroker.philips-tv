@@ -15,7 +15,7 @@ export declare abstract class API {
     protected constructor(
         /** The hostname this wrapper is bound to */
         hostname: string);
-    create(hostname: string): Promise<API>;
+    static create(hostname: string): Promise<API>;
     /** Tests if a given hostname supports this API version */
     protected abstract test(): Promise<boolean>;
     /** Determines which API version this wrapper represents */
@@ -35,8 +35,12 @@ export declare abstract class API {
     readonly params: Map<string, any>;
     /** Performs a GET request on the given resource and returns the result */
     get(path: string, options?: RequestOptions): Promise<string | FullResponse>;
+    /** Performs a GET request on the given resource and returns the result */
+    getWithDigestAuth(path: string, credentials: Credentials, options?: RequestOptions): Promise<string | FullResponse>;
     /** Posts JSON data to the given resource and returns the result */
     postJSONwithDigestAuth(path: string, credentials: Credentials, jsonPayload: any, options?: RequestOptions): Promise<string>;
     /** Posts JSON data to the given resource and returns the result */
     postJSON(path: string, jsonPayload: any, options?: RequestOptions): Promise<string>;
+    /** Checks if the configured host is reachable */
+    checkConnection(): Promise<boolean>;
 }

@@ -36,7 +36,9 @@
         "messagebox": true
     },
     "native": {
-        "host": ""
+        "host": "",
+        "username": "",
+        "password": ""
     },
     "objects": [],
     "instanceObjects": [

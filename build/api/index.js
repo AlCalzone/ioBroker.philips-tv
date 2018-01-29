@@ -51,32 +51,43 @@ var API = /** @class */ (function () {
         this.hostname = hostname;
         this._params = new Map();
     }
-    API.prototype.create = function (hostname) {
+    API.create = function (hostname) {
         return __awaiter(this, void 0, void 0, function () {
-            var ret;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            function ensureConnection(api) {
+                return __awaiter(this, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, api.checkConnection()];
+                            case 1:
+                                if (!(_a.sent()))
+                                    throw new Error("No connection to host " + hostname);
+                                return [2 /*return*/];
+                        }
+                    });
+                });
+            }
+            var ret, _i, _a, apiType;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        // try all possibilities
-                        // v1
-                        ret = new api_v1_1.APIv1(hostname);
-                        return [4 /*yield*/, ret.test()];
+                        _i = 0, _a = [api_v1_1.APIv1, api_v5_1.APIv5, api_v6_1.APIv6];
+                        _b.label = 1;
                     case 1:
-                        if (_a.sent())
-                            return [2 /*return*/, ret];
-                        // v5
-                        ret = new api_v5_1.APIv5(hostname);
-                        return [4 /*yield*/, ret.test()];
+                        if (!(_i < _a.length)) return [3 /*break*/, 5];
+                        apiType = _a[_i];
+                        ret = new apiType(hostname);
+                        return [4 /*yield*/, ensureConnection(ret)];
                     case 2:
-                        if (_a.sent())
-                            return [2 /*return*/, ret];
-                        // v6
-                        ret = new api_v6_1.APIv6(hostname);
+                        _b.sent();
                         return [4 /*yield*/, ret.test()];
                     case 3:
-                        if (_a.sent())
+                        if (_b.sent())
                             return [2 /*return*/, ret];
-                        throw new Error("No supported device found at \"" + hostname + "\"");
+                        _b.label = 4;
+                    case 4:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 5: throw new Error("No supported device found at \"" + hostname + "\"");
                 }
             });
         });
@@ -97,6 +108,24 @@ var API = /** @class */ (function () {
             return __generator(this, function (_a) {
                 reqOpts = Object.assign(options, {
                     uri: "" + this.requestPrefix + path,
+                });
+                return [2 /*return*/, request(reqOpts)];
+            });
+        });
+    };
+    /** Performs a GET request on the given resource and returns the result */
+    API.prototype.getWithDigestAuth = function (path, credentials, options) {
+        if (options === void 0) { options = {}; }
+        return __awaiter(this, void 0, void 0, function () {
+            var reqOpts;
+            return __generator(this, function (_a) {
+                reqOpts = Object.assign(options, {
+                    uri: "" + this.requestPrefix + path,
+                    auth: {
+                        username: credentials.username,
+                        password: credentials.password,
+                        sendImmediately: false,
+                    },
                 });
                 return [2 /*return*/, request(reqOpts)];
             });
@@ -134,6 +163,32 @@ var API = /** @class */ (function () {
                     json: jsonPayload,
                 });
                 return [2 /*return*/, request(reqOpts)];
+            });
+        });
+    };
+    /** Checks if the configured host is reachable */
+    API.prototype.checkConnection = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        // audio/volume has only a little data,
+                        // so we use that path to check the connection
+                        return [4 /*yield*/, this.get("", {
+                                timeout: 5000,
+                            })];
+                    case 1:
+                        // audio/volume has only a little data,
+                        // so we use that path to check the connection
+                        _a.sent();
+                        return [2 /*return*/, true];
+                    case 2:
+                        e_1 = _a.sent();
+                        return [2 /*return*/, false];
+                    case 3: return [2 /*return*/];
+                }
             });
         });
     };

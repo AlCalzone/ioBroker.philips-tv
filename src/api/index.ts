@@ -27,21 +27,18 @@ export abstract class API {
 		public readonly hostname: string,
 	) {}
 
-	public async create(hostname: string): Promise<API> {
+	public static async create(hostname: string): Promise<API> {
 		let ret: API;
-		// try all possibilities
 
-		// v1
-		ret = new APIv1(hostname);
-		if (await ret.test()) return ret;
+		async function ensureConnection(api: API) {
+			if (!await api.checkConnection()) throw new Error(`No connection to host ${hostname}`);
+		}
 
-		// v5
-		ret = new APIv5(hostname);
-		if (await ret.test()) return ret;
-
-		// v6
-		ret = new APIv6(hostname);
-		if (await ret.test()) return ret;
+		for (const apiType of [APIv1, APIv5, APIv6]) {
+			ret = new apiType(hostname);
+			await ensureConnection(ret);
+			if (await ret.test()) return ret;
+		}
 
 		throw new Error(`No supported device found at "${hostname}"`);
 	}
@@ -78,6 +75,19 @@ export abstract class API {
 		return request(reqOpts);
 	}
 
+	/** Performs a GET request on the given resource and returns the result */
+	public async getWithDigestAuth(path: string, credentials: Credentials, options: RequestOptions = {}): Promise<string | FullResponse> {
+		const reqOpts: OptionsWithUri = Object.assign(options, {
+			uri: `${this.requestPrefix}${path}`,
+			auth: {
+				username: credentials.username,
+				password: credentials.password,
+				sendImmediately: false,
+			},
+		});
+		return request(reqOpts);
+	}
+
 	/** Posts JSON data to the given resource and returns the result */
 	public async postJSONwithDigestAuth(path: string, credentials: Credentials, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
 		const reqOpts: OptionsWithUri = Object.assign(options, {
@@ -101,6 +111,20 @@ export abstract class API {
 			json: jsonPayload,
 		});
 		return request(reqOpts);
+	}
+
+	/** Checks if the configured host is reachable */
+	public async checkConnection(): Promise<boolean> {
+		try {
+			// audio/volume has only a little data,
+			// so we use that path to check the connection
+			await this.get("", {
+				timeout: 5000, // don't wait forever
+			});
+			return true;
+		} catch (e) {
+			return false;
+		}
 	}
 
 }

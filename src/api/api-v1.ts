@@ -1,14 +1,13 @@
-import { API, Credentials } from "./index";
+import { API, APIVersion, Credentials } from "./index";
 
 export class APIv1 extends API {
 
-	public async create(hostname: string): Promise<APIv1> {
-		const ret = new APIv1(hostname);
-		ret.requestPrefix = `http://${hostname}:1925/1/`;
-		return ret;
+	public constructor(hostname: string) {
+		super(hostname);
+		this.requestPrefix = `http://${hostname}:1925/1/`;
 	}
 
-	public version: "v1";
+	public readonly version: APIVersion = "v1";
 
 	/** Tests if a given hostname supports this API version */
 	protected async test(): Promise<boolean> {

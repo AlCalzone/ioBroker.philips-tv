@@ -48,19 +48,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = require("./index");
 var APIv5 = /** @class */ (function (_super) {
     __extends(APIv5, _super);
-    function APIv5() {
-        return _super !== null && _super.apply(this, arguments) || this;
+    function APIv5(hostname) {
+        var _this = _super.call(this, hostname) || this;
+        _this.version = "v5";
+        _this.requestPrefix = "http://" + hostname + ":1925/5/";
+        return _this;
     }
-    APIv5.prototype.create = function (hostname) {
-        return __awaiter(this, void 0, void 0, function () {
-            var ret;
-            return __generator(this, function (_a) {
-                ret = new APIv5(hostname);
-                ret.requestPrefix = "http://" + hostname + ":1925/5/";
-                return [2 /*return*/, ret];
-            });
-        });
-    };
     /** Tests if a given hostname supports this API version */
     APIv5.prototype.test = function () {
         return __awaiter(this, void 0, void 0, function () {

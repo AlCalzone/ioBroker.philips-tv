@@ -1,7 +1,7 @@
-import { API, Credentials } from "./index";
+import { API, APIVersion, Credentials } from "./index";
 export declare class APIv1 extends API {
-    create(hostname: string): Promise<APIv1>;
-    version: "v1";
+    constructor(hostname: string);
+    readonly version: APIVersion;
     /** Tests if a given hostname supports this API version */
     protected test(): Promise<boolean>;
     readonly requiresPairing: boolean;

@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
-import { FullResponse } from "request-promise-native";
-import { API, Credentials } from "./index";
+import { FullResponse, OptionsWithUri, RequestPromiseOptions as RequestOptions } from "request-promise-native";
+import { API, APIVersion, Credentials } from "./index";
 
 // see https://github.com/suborb/philips_android_tv/blob/master/philips.py for pairing procedure
 
@@ -14,13 +14,12 @@ function sign(data: Buffer): Buffer {
 
 export class APIv6 extends API {
 
-	public async create(hostname: string): Promise<APIv6> {
-		const ret = new APIv6(hostname);
-		ret.requestPrefix = `https://${hostname}:1925/6/`;
-		return ret;
+	public constructor(hostname: string) {
+		super(hostname);
+		this.requestPrefix = `https://${hostname}:1925/6/`;
 	}
 
-	public version: "v6";
+	public readonly version: APIVersion = "v6";
 
 	/** Tests if a given hostname supports this API version */
 	protected async test(): Promise<boolean> {
@@ -73,7 +72,7 @@ export class APIv6 extends API {
 			scope: ["read", "write", "control"],
 			device: this.getDeviceSpec(),
 		};
-		const response = JSON.parse(await this.postJSON("pair/request", requestPayload));
+		const response = JSON.parse(await super.postJSON("pair/request", requestPayload));
 		this.pairingContext = {
 			timestamp: response.timestamp,
 			auth_key: response.auth_key,
@@ -111,6 +110,16 @@ export class APIv6 extends API {
 	private credentials: Credentials;
 	public provideCredentials(credentials: Credentials): void {
 		this.credentials = credentials;
+	}
+
+	// overwrite get/postJSON to use the credentials
+	public postJSON(path: string, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
+		return super.postJSONwithDigestAuth(path, this.credentials, jsonPayload, options);
+	}
+
+	/** Performs a GET request on the given resource and returns the result */
+	public get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
+		return super.getWithDigestAuth(path, this.credentials, options);
 	}
 
 }

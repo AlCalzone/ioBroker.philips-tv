@@ -56,19 +56,12 @@ function sign(data) {
 }
 var APIv6 = /** @class */ (function (_super) {
     __extends(APIv6, _super);
-    function APIv6() {
-        return _super !== null && _super.apply(this, arguments) || this;
+    function APIv6(hostname) {
+        var _this = _super.call(this, hostname) || this;
+        _this.version = "v6";
+        _this.requestPrefix = "https://" + hostname + ":1925/6/";
+        return _this;
     }
-    APIv6.prototype.create = function (hostname) {
-        return __awaiter(this, void 0, void 0, function () {
-            var ret;
-            return __generator(this, function (_a) {
-                ret = new APIv6(hostname);
-                ret.requestPrefix = "https://" + hostname + ":1925/6/";
-                return [2 /*return*/, ret];
-            });
-        });
-    };
     /** Tests if a given hostname supports this API version */
     APIv6.prototype.test = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -133,7 +126,7 @@ var APIv6 = /** @class */ (function (_super) {
                             device: this.getDeviceSpec(),
                         };
                         _b = (_a = JSON).parse;
-                        return [4 /*yield*/, this.postJSON("pair/request", requestPayload)];
+                        return [4 /*yield*/, _super.prototype.postJSON.call(this, "pair/request", requestPayload)];
                     case 1:
                         response = _b.apply(_a, [_c.sent()]);
                         this.pairingContext = {
@@ -183,6 +176,16 @@ var APIv6 = /** @class */ (function (_super) {
     };
     APIv6.prototype.provideCredentials = function (credentials) {
         this.credentials = credentials;
+    };
+    // overwrite get/postJSON to use the credentials
+    APIv6.prototype.postJSON = function (path, jsonPayload, options) {
+        if (options === void 0) { options = {}; }
+        return _super.prototype.postJSONwithDigestAuth.call(this, path, this.credentials, jsonPayload, options);
+    };
+    /** Performs a GET request on the given resource and returns the result */
+    APIv6.prototype.get = function (path, options) {
+        if (options === void 0) { options = {}; }
+        return _super.prototype.getWithDigestAuth.call(this, path, this.credentials, options);
     };
     return APIv6;
 }(index_1.API));

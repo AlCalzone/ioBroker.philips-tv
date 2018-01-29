@@ -48,19 +48,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = require("./index");
 var APIv1 = /** @class */ (function (_super) {
     __extends(APIv1, _super);
-    function APIv1() {
-        return _super !== null && _super.apply(this, arguments) || this;
+    function APIv1(hostname) {
+        var _this = _super.call(this, hostname) || this;
+        _this.version = "v1";
+        _this.requestPrefix = "http://" + hostname + ":1925/1/";
+        return _this;
     }
-    APIv1.prototype.create = function (hostname) {
-        return __awaiter(this, void 0, void 0, function () {
-            var ret;
-            return __generator(this, function (_a) {
-                ret = new APIv1(hostname);
-                ret.requestPrefix = "http://" + hostname + ":1925/1/";
-                return [2 /*return*/, ret];
-            });
-        });
-    };
     /** Tests if a given hostname supports this API version */
     APIv1.prototype.test = function () {
         return __awaiter(this, void 0, void 0, function () {
