@@ -11,6 +11,9 @@ http://jointspace.sourceforge.net/projectdata/documentation/jasonApi/1/doc/API.h
 
 ## Changelog
 
+#### 0.3.0-alpha
+* (AlCalzone) Support for TVs with API v5
+
 #### 0.2.0
 * (AlCalzone) Support sending key presses
 

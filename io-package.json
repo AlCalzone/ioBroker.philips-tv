@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "philips-tv",
-        "version": "0.2.0",
+        "version": "0.3.0-alpha",
         "news": {
+            "0.3.0-alpha": {
+                "en": "Support for TVs with API v5",
+                "de": "Fernseher mit API v5 unterstützt"
+            },
             "0.2.0": {
                 "en": "Support sending key presses",
                 "de": "Senden von Tastendrücken unterstützt"
