@@ -59,7 +59,7 @@ var APIv6 = /** @class */ (function (_super) {
     function APIv6(hostname) {
         var _this = _super.call(this, hostname) || this;
         _this.version = "v6";
-        _this.requestPrefix = "https://" + hostname + ":1925/6/";
+        _this.requestPrefix = "https://" + hostname + ":1926/6/";
         return _this;
     }
     /** Tests if a given hostname supports this API version */

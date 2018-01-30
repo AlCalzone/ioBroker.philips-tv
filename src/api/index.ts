@@ -72,11 +72,16 @@ export abstract class API {
 	}
 
 	/** Performs a GET request on the given resource and returns the result */
-	public get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
+	private _get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: `${this.requestPrefix}${path}`,
 		});
-		return request(reqOpts);
+		return request(reqOpts) as any as Promise<string | FullResponse>;
+	}
+
+	/** Performs a GET request on the given resource and returns the result */
+	public get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
+		return this._get(path, options);
 	}
 
 	/** Performs a GET request on the given resource and returns the result */
@@ -89,7 +94,7 @@ export abstract class API {
 				sendImmediately: false,
 			},
 		});
-		return request(reqOpts);
+		return request(reqOpts) as any as Promise<string | FullResponse>;
 	}
 
 	/** Posts JSON data to the given resource and returns the result */
@@ -104,7 +109,7 @@ export abstract class API {
 				sendImmediately: false,
 			},
 		});
-		return request(reqOpts);
+		return request(reqOpts) as any as Promise<string>;
 	}
 
 	/** Posts JSON data to the given resource and returns the result */
@@ -114,24 +119,35 @@ export abstract class API {
 			method: "POST",
 			json: jsonPayload,
 		});
-		return request(reqOpts);
+		return request(reqOpts) as any as Promise<string>;
 	}
 
 	/** Checks if the configured host is reachable */
 	public async checkConnection(): Promise<boolean> {
 		_.log("checking if connection is alive", "debug");
 		try {
-			// audio/volume has only a little data,
-			// so we use that path to check the connection
-			await this.get("", {
+			// We always use the non-overwritten version for this as
+			// we might not have credentials yet.
+			await this._get("", {
 				timeout: 5000, // don't wait forever
 				simple: false, // connection is successful even with an error status code
 			});
 			_.log("connection is ALIVE", "debug");
 			return true;
 		} catch (e) {
-			_.log("connection is DEAD. reason: " + e.message, "debug");
-			return false;
+			// handle a couple of possible errors
+			switch (e.code) {
+				case "ECONNREFUSED":
+				case "ECONNRESET":
+					// the remote host is there, but it won't let us connect
+					// e.g. when trying to connect to port 1925 on a v6 TV
+					_.log("connection is ALIVE, but remote host won't let us connect", "debug");
+					return true;
+				case "ETIMEDOUT":
+				default:
+					_.log(`connection is DEAD. Reason: [${e.code}] ${e.message}`, "debug");
+					return false;
+			}
 		}
 	}
 

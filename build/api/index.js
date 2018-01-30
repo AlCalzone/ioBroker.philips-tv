@@ -101,12 +101,17 @@ var API = /** @class */ (function () {
         configurable: true
     });
     /** Performs a GET request on the given resource and returns the result */
-    API.prototype.get = function (path, options) {
+    API.prototype._get = function (path, options) {
         if (options === void 0) { options = {}; }
         var reqOpts = Object.assign(options, {
             uri: "" + this.requestPrefix + path,
         });
         return request(reqOpts);
+    };
+    /** Performs a GET request on the given resource and returns the result */
+    API.prototype.get = function (path, options) {
+        if (options === void 0) { options = {}; }
+        return this._get(path, options);
     };
     /** Performs a GET request on the given resource and returns the result */
     API.prototype.getWithDigestAuth = function (path, credentials, options) {
@@ -157,22 +162,34 @@ var API = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        // audio/volume has only a little data,
-                        // so we use that path to check the connection
-                        return [4 /*yield*/, this.get("", {
+                        // We always use the non-overwritten version for this as
+                        // we might not have credentials yet.
+                        return [4 /*yield*/, this._get("", {
                                 timeout: 5000,
                                 simple: false,
                             })];
                     case 2:
-                        // audio/volume has only a little data,
-                        // so we use that path to check the connection
+                        // We always use the non-overwritten version for this as
+                        // we might not have credentials yet.
                         _a.sent();
                         global_1.Global.log("connection is ALIVE", "debug");
                         return [2 /*return*/, true];
                     case 3:
                         e_1 = _a.sent();
-                        global_1.Global.log("connection is DEAD. reason: " + e_1.message, "debug");
-                        return [2 /*return*/, false];
+                        // handle a couple of possible errors
+                        switch (e_1.code) {
+                            case "ECONNREFUSED":
+                            case "ECONNRESET":
+                                // the remote host is there, but it won't let us connect
+                                // e.g. when trying to connect to port 1925 on a v6 TV
+                                global_1.Global.log("connection is ALIVE, but remote host won't let us connect", "debug");
+                                return [2 /*return*/, true];
+                            case "ETIMEDOUT":
+                            default:
+                                global_1.Global.log("connection is DEAD. Reason: [" + e_1.code + "] " + e_1.message, "debug");
+                                return [2 /*return*/, false];
+                        }
+                        return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];
                 }
             });

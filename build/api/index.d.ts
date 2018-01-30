@@ -33,6 +33,8 @@ export declare abstract class API {
     /** Additional params that should be stored over several API uses */
     readonly params: Map<string, any>;
     /** Performs a GET request on the given resource and returns the result */
+    private _get(path, options?);
+    /** Performs a GET request on the given resource and returns the result */
     get(path: string, options?: RequestOptions): Promise<string | FullResponse>;
     /** Performs a GET request on the given resource and returns the result */
     getWithDigestAuth(path: string, credentials: Credentials, options?: RequestOptions): Promise<string | FullResponse>;

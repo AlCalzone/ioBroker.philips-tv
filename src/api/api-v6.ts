@@ -16,7 +16,7 @@ export class APIv6 extends API {
 
 	public constructor(hostname: string) {
 		super(hostname);
-		this.requestPrefix = `https://${hostname}:1925/6/`;
+		this.requestPrefix = `https://${hostname}:1926/6/`;
 	}
 
 	public readonly version: APIVersion = "v6";
