@@ -35,7 +35,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var request = require("request-promise-native");
+var requestPackage = require("request-promise-native");
+var request = requestPackage.defaults({
+    timeout: 5000,
+    rejectUnauthorized: false,
+});
 var global_1 = require("../lib/global");
 var promises_1 = require("../lib/promises");
 // TODO all the request methods can be refactored
@@ -66,7 +70,6 @@ function checkConnection(hostname) {
                     // We always use the non-overwritten version for this as
                     // we might not have credentials yet.
                     return [4 /*yield*/, request_get("http://" + hostname + ":1925", {
-                            timeout: 5000,
                             simple: false,
                         })];
                 case 2:
@@ -159,7 +162,6 @@ var API = /** @class */ (function () {
         if (options === void 0) { options = {}; }
         var reqOpts = Object.assign(options, {
             uri: this.getRequestPath(path),
-            rejectUnauthorized: false,
         });
         return request(reqOpts);
     };
@@ -178,7 +180,6 @@ var API = /** @class */ (function () {
                 password: credentials.password,
                 sendImmediately: false,
             },
-            rejectUnauthorized: false,
         });
         return request(reqOpts);
     };
@@ -194,7 +195,6 @@ var API = /** @class */ (function () {
                 password: credentials.password,
                 sendImmediately: false,
             },
-            rejectUnauthorized: false,
         });
         return request(reqOpts);
     };
@@ -205,7 +205,6 @@ var API = /** @class */ (function () {
             uri: this.getRequestPath(path),
             method: "POST",
             json: jsonPayload,
-            rejectUnauthorized: false,
         });
         return request(reqOpts);
     };

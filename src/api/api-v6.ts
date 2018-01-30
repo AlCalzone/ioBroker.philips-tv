@@ -24,9 +24,9 @@ export class APIv6 extends API {
 	/** Tests if a given hostname supports this API version */
 	protected async test(): Promise<boolean> {
 		try {
-			// audio/volume has only a little data,
-			// so we use that path to check the connection
-			const resp = await this.get("audio/volume", {
+			// audio/volume has only a little data, so we use that path to check the connection
+			// call the /super/ version because that has no authentication
+			const resp = await super.get("audio/volume", {
 				resolveWithFullResponse: true, // we want to check the status code
 			}) as FullResponse;
 			// we expect a 2xx or 401 status code

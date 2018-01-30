@@ -70,7 +70,7 @@ var APIv6 = /** @class */ (function (_super) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.get("audio/volume", {
+                        return [4 /*yield*/, _super.prototype.get.call(this, "audio/volume", {
                                 resolveWithFullResponse: true,
                             })];
                     case 1:

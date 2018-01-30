@@ -1,4 +1,10 @@
-import * as request from "request-promise-native";
+import * as requestPackage from "request-promise-native";
+
+const request = requestPackage.defaults({
+	timeout: 5000, // don't wait forever
+	rejectUnauthorized: false, // enable self-signed certs
+});
+
 import { FullResponse, OptionsWithUri, RequestPromiseOptions as RequestOptions } from "request-promise-native";
 
 import { ExtendedAdapter, Global as _ } from "../lib/global";
@@ -34,7 +40,6 @@ async function checkConnection(hostname: string): Promise<boolean> {
 		// We always use the non-overwritten version for this as
 		// we might not have credentials yet.
 		await request_get(`http://${hostname}:1925`, {
-			timeout: 5000, // don't wait forever
 			simple: false, // connection is successful even with an error status code
 		});
 		_.log("connection is ALIVE", "debug");
@@ -122,7 +127,6 @@ export abstract class API {
 	private _get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: this.getRequestPath(path),
-			rejectUnauthorized: false,
 		});
 		return request(reqOpts) as any as Promise<string | FullResponse>;
 	}
@@ -141,7 +145,6 @@ export abstract class API {
 				password: credentials.password,
 				sendImmediately: false,
 			},
-			rejectUnauthorized: false,
 		});
 		return request(reqOpts) as any as Promise<string | FullResponse>;
 	}
@@ -157,7 +160,6 @@ export abstract class API {
 				password: credentials.password,
 				sendImmediately: false,
 			},
-			rejectUnauthorized: false,
 		});
 		return request(reqOpts) as any as Promise<string>;
 	}
@@ -168,7 +170,6 @@ export abstract class API {
 			uri: this.getRequestPath(path),
 			method: "POST",
 			json: jsonPayload,
-			rejectUnauthorized: false,
 		});
 		return request(reqOpts) as any as Promise<string>;
 	}
