@@ -105,6 +105,7 @@ var API = /** @class */ (function () {
         if (options === void 0) { options = {}; }
         var reqOpts = Object.assign(options, {
             uri: "" + this.requestPrefix + path,
+            insecure: true,
         });
         return request(reqOpts);
     };
@@ -123,6 +124,7 @@ var API = /** @class */ (function () {
                 password: credentials.password,
                 sendImmediately: false,
             },
+            insecure: true,
         });
         return request(reqOpts);
     };
@@ -138,6 +140,7 @@ var API = /** @class */ (function () {
                 password: credentials.password,
                 sendImmediately: false,
             },
+            insecure: true,
         });
         return request(reqOpts);
     };
@@ -148,6 +151,7 @@ var API = /** @class */ (function () {
             uri: "" + this.requestPrefix + path,
             method: "POST",
             json: jsonPayload,
+            insecure: true,
         });
         return request(reqOpts);
     };

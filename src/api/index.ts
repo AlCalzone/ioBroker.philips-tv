@@ -75,6 +75,7 @@ export abstract class API {
 	private _get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: `${this.requestPrefix}${path}`,
+			insecure: true,
 		});
 		return request(reqOpts) as any as Promise<string | FullResponse>;
 	}
@@ -93,6 +94,7 @@ export abstract class API {
 				password: credentials.password,
 				sendImmediately: false,
 			},
+			insecure: true,
 		});
 		return request(reqOpts) as any as Promise<string | FullResponse>;
 	}
@@ -108,6 +110,7 @@ export abstract class API {
 				password: credentials.password,
 				sendImmediately: false,
 			},
+			insecure: true,
 		});
 		return request(reqOpts) as any as Promise<string>;
 	}
@@ -118,6 +121,7 @@ export abstract class API {
 			uri: `${this.requestPrefix}${path}`,
 			method: "POST",
 			json: jsonPayload,
+			insecure: true,
 		});
 		return request(reqOpts) as any as Promise<string>;
 	}
