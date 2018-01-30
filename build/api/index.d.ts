@@ -29,9 +29,11 @@ export declare abstract class API {
     abstract provideCredentials(credentials: Credentials): void;
     /** The prefix for all http requests */
     protected requestPrefix: string;
+    protected connectionCheckUri: string;
     private _params;
     /** Additional params that should be stored over several API uses */
     readonly params: Map<string, any>;
+    private getRequestPath(path);
     /** Performs a GET request on the given resource and returns the result */
     private _get(path, options?);
     /** Performs a GET request on the given resource and returns the result */

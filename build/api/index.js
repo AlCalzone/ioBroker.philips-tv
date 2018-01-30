@@ -37,6 +37,65 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var request = require("request-promise-native");
 var global_1 = require("../lib/global");
+var promises_1 = require("../lib/promises");
+// TODO all the request methods can be refactored
+/** Performs a GET request on the given resource and returns the result */
+function request_get(path, options) {
+    if (options === void 0) { options = {}; }
+    return __awaiter(this, void 0, void 0, function () {
+        var reqOpts;
+        return __generator(this, function (_a) {
+            reqOpts = Object.assign(options, {
+                uri: path,
+                rejectUnauthorized: false,
+            });
+            return [2 /*return*/, request(reqOpts)];
+        });
+    });
+}
+function checkConnection(hostname) {
+    return __awaiter(this, void 0, void 0, function () {
+        var e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    global_1.Global.log("checking if connection is alive", "debug");
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    // We always use the non-overwritten version for this as
+                    // we might not have credentials yet.
+                    return [4 /*yield*/, request_get("http://" + hostname + ":1925", {
+                            timeout: 5000,
+                            simple: false,
+                        })];
+                case 2:
+                    // We always use the non-overwritten version for this as
+                    // we might not have credentials yet.
+                    _a.sent();
+                    global_1.Global.log("connection is ALIVE", "debug");
+                    return [2 /*return*/, true];
+                case 3:
+                    e_1 = _a.sent();
+                    // handle a couple of possible errors
+                    switch (e_1.code) {
+                        case "ECONNREFUSED":
+                        case "ECONNRESET":
+                            // the remote host is there, but it won't let us connect
+                            // e.g. when trying to connect to port 1925 on a v6 TV
+                            global_1.Global.log("connection is ALIVE, but remote host won't let us connect", "debug");
+                            return [2 /*return*/, true];
+                        case "ETIMEDOUT":
+                        default:
+                            global_1.Global.log("connection is DEAD. Reason: [" + e_1.code + "] " + e_1.message, "debug");
+                            return [2 /*return*/, false];
+                    }
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
 /**
  * Common base class for all specialized APIs that support a range of devices
  */
@@ -49,45 +108,37 @@ var API = /** @class */ (function () {
     }
     API.create = function (hostname) {
         return __awaiter(this, void 0, void 0, function () {
-            function ensureConnection(api) {
-                return __awaiter(this, void 0, void 0, function () {
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0: return [4 /*yield*/, api.checkConnection()];
-                            case 1:
-                                if (!(_a.sent()))
-                                    throw new Error("No connection to host " + hostname);
-                                return [2 /*return*/];
-                        }
-                    });
-                });
-            }
             var ret, _i, _a, apiType;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0:
+                    case 0: return [4 /*yield*/, checkConnection(hostname)];
+                    case 1:
+                        if (!(_b.sent()))
+                            throw new Error("No connection to host " + hostname);
                         global_1.Global.log("detecting API version", "debug");
                         _i = 0, _a = [api_v1_1.APIv1, api_v5_1.APIv5, api_v6_1.APIv6];
-                        _b.label = 1;
-                    case 1:
-                        if (!(_i < _a.length)) return [3 /*break*/, 5];
+                        _b.label = 2;
+                    case 2:
+                        if (!(_i < _a.length)) return [3 /*break*/, 7];
                         apiType = _a[_i];
                         global_1.Global.log("testing " + apiType.name, "debug");
                         ret = new apiType(hostname);
-                        return [4 /*yield*/, ensureConnection(ret)];
-                    case 2:
-                        _b.sent();
                         return [4 /*yield*/, ret.test()];
                     case 3:
-                        if (_b.sent()) {
-                            global_1.Global.log("TV has " + apiType.name, "debug");
-                            return [2 /*return*/, ret];
-                        }
-                        _b.label = 4;
-                    case 4:
+                        if (!_b.sent()) return [3 /*break*/, 4];
+                        global_1.Global.log("TV has " + apiType.name, "debug");
+                        return [2 /*return*/, ret];
+                    case 4: 
+                    // don't request too fast
+                    return [4 /*yield*/, promises_1.wait(100)];
+                    case 5:
+                        // don't request too fast
+                        _b.sent();
+                        _b.label = 6;
+                    case 6:
                         _i++;
-                        return [3 /*break*/, 1];
-                    case 5: throw new Error("No supported device/API version found at \"" + hostname + "\"");
+                        return [3 /*break*/, 2];
+                    case 7: throw new Error("No supported device/API version found at \"" + hostname + "\"");
                 }
             });
         });
@@ -100,12 +151,15 @@ var API = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    API.prototype.getRequestPath = function (path) {
+        return path.startsWith("http") ? path : "" + this.requestPrefix + path;
+    };
     /** Performs a GET request on the given resource and returns the result */
     API.prototype._get = function (path, options) {
         if (options === void 0) { options = {}; }
         var reqOpts = Object.assign(options, {
-            uri: "" + this.requestPrefix + path,
-            insecure: true,
+            uri: this.getRequestPath(path),
+            rejectUnauthorized: false,
         });
         return request(reqOpts);
     };
@@ -118,13 +172,13 @@ var API = /** @class */ (function () {
     API.prototype.getWithDigestAuth = function (path, credentials, options) {
         if (options === void 0) { options = {}; }
         var reqOpts = Object.assign(options, {
-            uri: "" + this.requestPrefix + path,
+            uri: this.getRequestPath(path),
             auth: {
                 username: credentials.username,
                 password: credentials.password,
                 sendImmediately: false,
             },
-            insecure: true,
+            rejectUnauthorized: false,
         });
         return request(reqOpts);
     };
@@ -132,7 +186,7 @@ var API = /** @class */ (function () {
     API.prototype.postJSONwithDigestAuth = function (path, credentials, jsonPayload, options) {
         if (options === void 0) { options = {}; }
         var reqOpts = Object.assign(options, {
-            uri: "" + this.requestPrefix + path,
+            uri: this.getRequestPath(path),
             method: "POST",
             json: jsonPayload,
             auth: {
@@ -140,7 +194,7 @@ var API = /** @class */ (function () {
                 password: credentials.password,
                 sendImmediately: false,
             },
-            insecure: true,
+            rejectUnauthorized: false,
         });
         return request(reqOpts);
     };
@@ -148,56 +202,16 @@ var API = /** @class */ (function () {
     API.prototype.postJSON = function (path, jsonPayload, options) {
         if (options === void 0) { options = {}; }
         var reqOpts = Object.assign(options, {
-            uri: "" + this.requestPrefix + path,
+            uri: this.getRequestPath(path),
             method: "POST",
             json: jsonPayload,
-            insecure: true,
+            rejectUnauthorized: false,
         });
         return request(reqOpts);
     };
     /** Checks if the configured host is reachable */
     API.prototype.checkConnection = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var e_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        global_1.Global.log("checking if connection is alive", "debug");
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        // We always use the non-overwritten version for this as
-                        // we might not have credentials yet.
-                        return [4 /*yield*/, this._get("", {
-                                timeout: 5000,
-                                simple: false,
-                            })];
-                    case 2:
-                        // We always use the non-overwritten version for this as
-                        // we might not have credentials yet.
-                        _a.sent();
-                        global_1.Global.log("connection is ALIVE", "debug");
-                        return [2 /*return*/, true];
-                    case 3:
-                        e_1 = _a.sent();
-                        // handle a couple of possible errors
-                        switch (e_1.code) {
-                            case "ECONNREFUSED":
-                            case "ECONNRESET":
-                                // the remote host is there, but it won't let us connect
-                                // e.g. when trying to connect to port 1925 on a v6 TV
-                                global_1.Global.log("connection is ALIVE, but remote host won't let us connect", "debug");
-                                return [2 /*return*/, true];
-                            case "ETIMEDOUT":
-                            default:
-                                global_1.Global.log("connection is DEAD. Reason: [" + e_1.code + "] " + e_1.message, "debug");
-                                return [2 /*return*/, false];
-                        }
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
-                }
-            });
-        });
+        return checkConnection(this.hostname);
     };
     return API;
 }());
