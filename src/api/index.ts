@@ -3,7 +3,11 @@ import * as requestPackage from "request-promise-native";
 const request = requestPackage.defaults({
 	timeout: 5000, // don't wait forever
 	rejectUnauthorized: false, // enable self-signed certs
-});
+	agent: false,
+	pool: {
+		maxSockets: 1000,
+	},
+} as any as requestPackage.RequestPromiseOptions);
 
 import { FullResponse, OptionsWithUri, RequestPromiseOptions as RequestOptions } from "request-promise-native";
 

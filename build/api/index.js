@@ -39,6 +39,10 @@ var requestPackage = require("request-promise-native");
 var request = requestPackage.defaults({
     timeout: 5000,
     rejectUnauthorized: false,
+    agent: false,
+    pool: {
+        maxSockets: 1000,
+    },
 });
 var global_1 = require("../lib/global");
 var promises_1 = require("../lib/promises");
