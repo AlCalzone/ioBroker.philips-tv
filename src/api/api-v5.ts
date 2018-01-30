@@ -1,3 +1,4 @@
+import { ExtendedAdapter, Global as _ } from "../lib/global";
 import { API, APIVersion, Credentials } from "./index";
 
 export class APIv5 extends API {
@@ -19,6 +20,7 @@ export class APIv5 extends API {
 			});
 			return true;
 		} catch (e) {
+			_.log(`API test for v5 failed. Reason: [${e.code}] ${e.message}`, "debug");
 			return false;
 		}
 	}

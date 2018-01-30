@@ -46,6 +46,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var crypto = require("crypto");
+var global_1 = require("../lib/global");
 var index_1 = require("./index");
 // see https://github.com/suborb/philips_android_tv/blob/master/philips.py for pairing procedure
 var secret = Buffer.from("ZmVay1EQVFOaZhwQ4Kv81ypLAZNczV9sG4KkseXWn1NEk6cXmPKO/MCa9sryslvLCFMnNe4Z4CPXzToowvhHvA==", "base64");
@@ -72,6 +73,7 @@ var APIv6 = /** @class */ (function (_super) {
                         _a.trys.push([0, 2, , 3]);
                         return [4 /*yield*/, _super.prototype.get.call(this, "audio/volume", {
                                 resolveWithFullResponse: true,
+                                simple: false,
                             })];
                     case 1:
                         resp = _a.sent();
@@ -80,6 +82,7 @@ var APIv6 = /** @class */ (function (_super) {
                                 (resp.statusCode >= 200 && resp.statusCode <= 299)];
                     case 2:
                         e_1 = _a.sent();
+                        global_1.Global.log("API test for v6 failed. Reason: [" + e_1.code + "] " + e_1.message, "debug");
                         return [2 /*return*/, false];
                     case 3: return [2 /*return*/];
                 }

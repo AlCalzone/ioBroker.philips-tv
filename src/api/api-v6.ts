@@ -1,5 +1,6 @@
 import * as crypto from "crypto";
 import { FullResponse, OptionsWithUri, RequestPromiseOptions as RequestOptions } from "request-promise-native";
+import { ExtendedAdapter, Global as _ } from "../lib/global";
 import { API, APIVersion, Credentials } from "./index";
 
 // see https://github.com/suborb/philips_android_tv/blob/master/philips.py for pairing procedure
@@ -28,12 +29,14 @@ export class APIv6 extends API {
 			// call the /super/ version because that has no authentication
 			const resp = await super.get("audio/volume", {
 				resolveWithFullResponse: true, // we want to check the status code
+				simple: false, // connection is successful even with an error status code
 			}) as FullResponse;
 			// we expect a 2xx or 401 status code
 			return (resp.statusCode === 401) ||
 				(resp.statusCode >= 200 && resp.statusCode <= 299)
 				;
 		} catch (e) {
+			_.log(`API test for v6 failed. Reason: [${e.code}] ${e.message}`, "debug");
 			return false;
 		}
 	}

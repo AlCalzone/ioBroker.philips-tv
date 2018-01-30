@@ -45,6 +45,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var global_1 = require("../lib/global");
 var index_1 = require("./index");
 var APIv1 = /** @class */ (function (_super) {
     __extends(APIv1, _super);
@@ -74,6 +75,7 @@ var APIv1 = /** @class */ (function (_super) {
                         return [2 /*return*/, true];
                     case 2:
                         e_1 = _a.sent();
+                        global_1.Global.log("API test for v1 failed. Reason: [" + e_1.code + "] " + e_1.message, "debug");
                         return [2 /*return*/, false];
                     case 3: return [2 /*return*/];
                 }
