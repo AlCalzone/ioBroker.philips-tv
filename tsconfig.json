@@ -5,7 +5,7 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "noEmitOnError": true,     // dont compile faulty code
-        "noImplicitAny": false,     // set to true for stricter type checking
+        "noImplicitAny": true,     // set to true for stricter type checking
         "outDir": "build/",
         "removeComments": false,
 
@@ -16,8 +16,9 @@
         "inlineSourceMap": false,
         //"sourceRoot": "src/",
         "target": "es5",
-        "lib": [ "es6" ]
-        //"watch": true
+        "lib": [ "es6" ],
+        
+        "strictPropertyInitialization": true
     },
     "include": [
         "src/**/*.ts"

@@ -8,7 +8,7 @@ import * as request from "request-promise-native";
 import { API, Credentials } from "./api/index";
 import { ensureInstanceObjects } from "./lib/fix-objects";
 import { ExtendedAdapter, Global as _ } from "./lib/global";
-import { composeObject, DictionaryLike, entries, values } from "./lib/object-polyfill";
+import { composeObject, entries, values } from "./lib/object-polyfill";
 // import { wait } from "./lib/promises";
 
 // Adapter-Utils laden

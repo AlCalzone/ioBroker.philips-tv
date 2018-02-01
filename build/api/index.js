@@ -108,8 +108,8 @@ function checkConnection(hostname) {
  */
 var API = /** @class */ (function () {
     function API(
-        /** The hostname this wrapper is bound to */
-        hostname) {
+    /** The hostname this wrapper is bound to */
+    hostname) {
         this.hostname = hostname;
         this._params = new Map();
     }
