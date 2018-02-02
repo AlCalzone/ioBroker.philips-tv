@@ -5,7 +5,7 @@ require("buffer-v6-polyfill");
 import * as request from "request-promise-native";
 
 // Eigene Module laden
-import { API, Credentials } from "./api/index";
+import { API, APIVersion, Credentials } from "./api/index";
 import { ensureInstanceObjects } from "./lib/fix-objects";
 import { ExtendedAdapter, Global as _ } from "./lib/global";
 import { composeObject, entries, values } from "./lib/object-polyfill";
@@ -61,8 +61,58 @@ let adapter: ExtendedAdapter = utils.adapter({
 	},
 
 	// Handle sendTo-Messages
-	message: (obj: ioBroker.Message) => {
-		// TODO
+	message: async (obj: ioBroker.Message) => {
+		interface Response {
+			error?: string;
+			result?: any;
+		}
+		type ResponseFactory = (...args: any[]) => Response;
+		// responds to the adapter that sent the original message
+		function respond(response: Response) {
+			if (obj.callback) _.adapter.sendTo(obj.from, obj.command, response, obj.callback);
+		}
+		// some predefined responses so we only have to define them once
+		const responses = {
+			ACK: { error: null },
+			OK: { error: null, result: "ok" },
+			ERROR_UNKNOWN_COMMAND: { error: "Unknown command!" },
+			MISSING_PARAMETER: (paramName) => {
+				return { error: 'missing parameter "' + paramName + '"!' };
+			},
+			COMMAND_RUNNING: { error: "command running" },
+			RESULT: (result) => ({ error: null, result }),
+			ERROR: (error: string) => ({ error }),
+		};
+		// make required parameters easier
+		function requireParams(...params: string[]) {
+			if (!(params && params.length)) return true;
+			for (const param of params) {
+				if (!(obj.message && obj.message.hasOwnProperty(param))) {
+					respond(responses.MISSING_PARAMETER(param));
+					return false;
+				}
+			}
+			return true;
+		}
+
+		// handle the message
+		if (obj) {
+			switch (obj.command) {
+
+				case "getTVInfo": {
+					const ret = {
+						apiVersion: api ? api.version : "not connected",
+						requiresPairing: api ? api.requiresPairing : false,
+					};
+					respond(responses.RESULT(ret));
+					return;
+				}
+
+				default:
+					respond(responses.ERROR_UNKNOWN_COMMAND);
+					return;
+			}
+		}
 	},
 
 	objectChange: (id, obj) => {

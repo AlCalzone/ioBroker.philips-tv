@@ -94,9 +94,61 @@ var adapter = utils_1.default.adapter({
         });
     }); },
     // Handle sendTo-Messages
-    message: function (obj) {
-        // TODO
-    },
+    message: function (obj) { return __awaiter(_this, void 0, void 0, function () {
+        // responds to the adapter that sent the original message
+        function respond(response) {
+            if (obj.callback)
+                global_1.Global.adapter.sendTo(obj.from, obj.command, response, obj.callback);
+        }
+        // make required parameters easier
+        function requireParams() {
+            var params = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                params[_i] = arguments[_i];
+            }
+            if (!(params && params.length))
+                return true;
+            for (var _a = 0, params_1 = params; _a < params_1.length; _a++) {
+                var param = params_1[_a];
+                if (!(obj.message && obj.message.hasOwnProperty(param))) {
+                    respond(responses.MISSING_PARAMETER(param));
+                    return false;
+                }
+            }
+            return true;
+        }
+        var responses, ret;
+        return __generator(this, function (_a) {
+            responses = {
+                ACK: { error: null },
+                OK: { error: null, result: "ok" },
+                ERROR_UNKNOWN_COMMAND: { error: "Unknown command!" },
+                MISSING_PARAMETER: function (paramName) {
+                    return { error: 'missing parameter "' + paramName + '"!' };
+                },
+                COMMAND_RUNNING: { error: "command running" },
+                RESULT: function (result) { return ({ error: null, result: result }); },
+                ERROR: function (error) { return ({ error: error }); },
+            };
+            // handle the message
+            if (obj) {
+                switch (obj.command) {
+                    case "getTVInfo": {
+                        ret = {
+                            apiVersion: api ? api.version : "not connected",
+                            requiresPairing: api ? api.requiresPairing : false,
+                        };
+                        respond(responses.RESULT(ret));
+                        return [2 /*return*/];
+                    }
+                    default:
+                        respond(responses.ERROR_UNKNOWN_COMMAND);
+                        return [2 /*return*/];
+                }
+            }
+            return [2 /*return*/];
+        });
+    }); },
     objectChange: function (id, obj) {
         global_1.Global.log("{{blue}} object with id " + id + " " + (obj ? "updated" : "deleted"), "debug");
         if (id.startsWith(adapter.namespace)) {

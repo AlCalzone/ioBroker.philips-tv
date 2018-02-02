@@ -5,7 +5,7 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "noEmitOnError": true,     // dont compile faulty code
-        "noImplicitAny": true,     // set to true for stricter type checking
+        "noImplicitAny": false,     // set to true for stricter type checking
         "outDir": "build/",
         "removeComments": false,
 
