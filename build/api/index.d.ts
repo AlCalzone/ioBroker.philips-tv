@@ -14,7 +14,7 @@ export declare abstract class API {
     protected constructor(
         /** The hostname this wrapper is bound to */
         hostname: string);
-    static create(hostname: string): Promise<API>;
+    static create(hostname: string): Promise<API | undefined>;
     /** Tests if a given hostname supports this API version */
     protected abstract test(): Promise<boolean>;
     /** Determines which API version this wrapper represents */

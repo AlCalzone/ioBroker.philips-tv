@@ -68,6 +68,45 @@
             "native": {}
         },
         {
+            "_id": "info.apiVersion",
+            "type": "state",
+            "common": {
+                "role": "indicator.apiVersion",
+                "name": "The API version of the TV",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.requiresPairing",
+            "type": "state",
+            "common": {
+                "role": "indicator.requiresPairing",
+                "name": "If the TV needs to be paired",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.paired",
+            "type": "state",
+            "common": {
+                "role": "indicator.paired",
+                "name": "If the TV is currently paired",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
             "_id": "pressKey",
             "type": "state",
             "common": {

@@ -98,16 +98,6 @@ let adapter: ExtendedAdapter = utils.adapter({
 		// handle the message
 		if (obj) {
 			switch (obj.command) {
-
-				case "getTVInfo": {
-					const ret = {
-						apiVersion: api ? api.version : "not connected",
-						requiresPairing: api ? api.requiresPairing : false,
-					};
-					respond(responses.RESULT(ret));
-					return;
-				}
-
 				default:
 					respond(responses.ERROR_UNKNOWN_COMMAND);
 					return;
@@ -264,25 +254,58 @@ async function extendObject(objId: string, obj: ioBroker.Object) {
 let pingTimer: NodeJS.Timer;
 let connectionAlive: boolean = false;
 
+async function updateTVInfo(info: {
+	apiVersion: APIVersion | "not found",
+	requiresPairing?: boolean,
+	paired?: boolean,
+}) {
+	await adapter.$setState("info.apiVersion", info.apiVersion, true);
+	if (info.requiresPairing != null) await adapter.$setState("info.requiresPairing", info.requiresPairing, true);
+	if (info.paired != null) await adapter.$setState("info.paired", info.paired, true);
+}
+
 async function pingThread() {
 
 	const oldValue = connectionAlive;
 
 	// if this is the first time connecting to the TV, determine the API version
 	if (api == null) {
+		let retry: boolean = true;
 		try {
 			adapter.log.debug(`initializing connection to ${hostname}`);
 			api = await API.create(hostname);
-			// check if we need credentials and also have them
-			if (api.requiresPairing && (credentials.username === "" || credentials.password === "")) {
-				adapter.log.warn(`The TV at ${hostname} needs to be paired before you can use the adapter. Go to the adapter config to continue!`);
-				return;
+			if (api == null) {
+				// no compatible API found
+				adapter.log.warn(`The TV at ${hostname} has an API version incompatible with this adapter!`);
+				await updateTVInfo({ apiVersion: "unknown" });
+				connectionAlive = false;
+				retry = false;
+			} else {
+				// check if we need credentials and also have them
+				const isPaired = (credentials.username !== "" || credentials.password !== "");
+				await updateTVInfo({
+					apiVersion: api.version,
+					requiresPairing: api.requiresPairing,
+					paired: isPaired,
+				});
+				if (api.requiresPairing && !isPaired) {
+					adapter.log.warn(`The TV at ${hostname} needs to be paired before you can use the adapter. Go to the adapter config to continue!`);
+					connectionAlive = false;
+					retry = false;
+				} else {
+					// all good
+					connectionAlive = true;
+				}
 			}
-			connectionAlive = true;
 		} catch (e) {
+			await updateTVInfo({ apiVersion: "not found" });
 			adapter.log.debug(`Could not initialize connection. Reason: ${e.message}`);
 			connectionAlive = false;
 		}
+
+		// if there's no hope of creating a connection, stop
+		if (!retry) return;
+
 	} else {
 		connectionAlive = await api.checkConnection();
 	}

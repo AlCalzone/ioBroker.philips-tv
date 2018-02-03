@@ -76,7 +76,7 @@ export abstract class API {
 		public readonly hostname: string,
 	) { }
 
-	public static async create(hostname: string): Promise<API> {
+	public static async create(hostname: string): Promise<API | undefined> {
 		let ret: API;
 
 		if (!await checkConnection(hostname)) throw new Error(`No connection to host ${hostname}`);
@@ -95,7 +95,7 @@ export abstract class API {
 			}
 		}
 
-		throw new Error(`No supported device/API version found at "${hostname}"`);
+		return undefined;
 	}
 
 	/** Tests if a given hostname supports this API version */

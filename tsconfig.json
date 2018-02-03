@@ -16,7 +16,10 @@
         "inlineSourceMap": false,
         //"sourceRoot": "src/",
         "target": "es5",
-        "lib": [ "es6" ],
+        "lib": [
+            "es6",
+            "dom" // <= necessary to get rid of @types/jquery errors
+        ],
         
         "strictPropertyInitialization": true
     },
@@ -24,6 +27,7 @@
         "src/**/*.ts"
     ],
     "exclude": [
+        "node_modules/**/*.d.ts",
         "admin/**/*.ts",
         "src/**/*.test.ts"
     ]

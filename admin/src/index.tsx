@@ -1,80 +1,91 @@
+// tslint:disable-next-line:no-reference
+/// <reference path="../../src/lib/ioBroker.d.ts" />
+
 // root objects
 import * as $ from "jquery";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import {$$, $window, _, instance, sendTo, socket} from "./lib/adapter";
+import { promisify } from "../../src/lib/promises";
+import { $$, $window, _, instance, sendTo, socket } from "./lib/adapter";
 
 // components
-import Fragment from "./components/fragment";
-import { Tabs } from "./components/tabs";
-import { GroupDictionary, Groups } from "./pages/groups";
-import { OnSettingsChangedCallback, Settings } from "./pages/settings";
+import { OnSettingsChangedCallback, Settings, TVInfo } from "./pages/settings";
 
-const namespace = `tradfri.${instance}`;
+const namespace = `philips-tv.${instance}`;
 
 // layout components
 function Header() {
 	return (
-		<h3 className="translate" data-role="adapter-name">{_("Tradfri adapter settings")}</h3>
+		<h3 className="translate" data-role="adapter-name">{_("Philips TV adapter settings")}</h3>
 	);
 }
 
-export class Root extends React.Component<any, any> {
+const $emit = promisify<any>(socket.emit.bind(socket));
+
+export class Root extends React.Component<any, { tvInfo: TVInfo }> {
 
 	constructor(props) {
 		super(props);
 		this.state = {
-			groups: {},
-			devices: {},
+			tvInfo: null,
 		};
 	}
 
+	private updateTimer;
+
 	public componentDidMount() {
-		// subscribe to changes of virtual group objects
-		socket.emit("subscribeObjects", namespace + ".VG-*");
-		socket.on("objectChange", (id: string, obj) => {
+		// subscribe to the TV state
+		socket.emit("subscribeStates", namespace + ".info.*");
+		socket.on("stateChange", (id: string, state: ioBroker.State) => {
 			if (id.substring(0, namespace.length) !== namespace) return;
-			if (id.match(/VG\-\d+$/)) {
-				this.updateGroups();
-			} else if (!obj || obj.common.type === "device") {
-				this.updateDevices();
+			console.log(`state changed: ${id} => ${state.val}`);
+			const tvInfo = this.state.tvInfo;
+			if (id.match(/info\.apiVersion/)) {
+				tvInfo.apiVersion = state.val;
+				this.setState({ tvInfo });
+			} else if (id.match(/info\.requiresPairing/)) {
+				tvInfo.requiresPairing = state.val;
+				this.setState({ tvInfo });
+			} else if (id.match(/info\.paired/)) {
+				tvInfo.paired = state.val;
+				this.setState({ tvInfo });
 			}
 		});
-		// and update once on start
-		this.updateGroups();
-		this.updateDevices();
+
+		// wait for the adapter to get the TV's information
+		this.updateTVInfo();
 	}
 
-	public updateGroups() {
-		sendTo(null, "getGroups", { type: "virtual" }, (result) => {
-			if (result && result.error) {
-				console.error(result.error);
-			} else {
-				this.setState({groups: result.result as GroupDictionary});
-			}
-		});
+	public componentWillUnmount() {
+		if (this.updateTimer != null) clearInterval(this.updateTimer);
 	}
 
-	public updateDevices() {
-		sendTo(null, "getDevices", { type: "lightbulb" }, (result) => {
-			if (result && result.error) {
-				console.error(result.error);
-			} else {
-				this.setState({devices: result.result as GroupDictionary});
-			}
-		});
+	public async updateTVInfo() {
+		try {
+			const states = {
+				apiVersion: await $emit("getState", `${namespace}.info.apiVersion`),
+				requiresPairing: await $emit("getState", `${namespace}.info.requiresPairing`),
+				paired: await $emit("getState", `${namespace}.info.paired`),
+			};
+			this.setState({
+				tvInfo: {
+					apiVersion: states.apiVersion ? states.apiVersion.val : null,
+					requiresPairing: states.requiresPairing ? states.requiresPairing.val : null,
+					paired: states.paired ? states.paired.val : null,
+				},
+			});
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
 	public render() {
 		return (
-			<Fragment>
+			<>
 				<Header />
-				<Tabs labels={["Settings", "Groups"]}>
-					<Settings settings={this.props.settings} onChange={this.props.onSettingsChanged} />
-					<Groups groups={this.state.groups} devices={this.state.devices} />
-				</Tabs>
-			</Fragment>
+				<Settings settings={this.props.settings} onChange={this.props.onSettingsChanged} tvInfo={this.state.tvInfo} />
+			</>
 		);
 	}
 

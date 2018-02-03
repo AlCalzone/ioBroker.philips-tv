@@ -145,7 +145,7 @@ var API = /** @class */ (function () {
                     case 6:
                         _i++;
                         return [3 /*break*/, 2];
-                    case 7: throw new Error("No supported device/API version found at \"" + hostname + "\"");
+                    case 7: return [2 /*return*/, undefined];
                 }
             });
         });
