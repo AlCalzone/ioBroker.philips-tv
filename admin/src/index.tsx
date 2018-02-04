@@ -23,11 +23,12 @@ function Header() {
 
 const $emit = promisify<any>(socket.emit.bind(socket));
 
-export class Root extends React.Component<any, { tvInfo: TVInfo }> {
+export class Root extends React.Component<any, { tvInfo: TVInfo, settings: Record<string, any> }> {
 
 	constructor(props) {
 		super(props);
 		this.state = {
+			settings: this.props.settings,
 			tvInfo: null,
 		};
 	}
@@ -36,7 +37,7 @@ export class Root extends React.Component<any, { tvInfo: TVInfo }> {
 
 	public componentDidMount() {
 		// subscribe to the TV state
-		socket.emit("subscribeStates", namespace + ".info.*");
+		socket.emit("subscribe", namespace + ".info.*");
 		socket.on("stateChange", (id: string, state: ioBroker.State) => {
 			if (id.substring(0, namespace.length) !== namespace) return;
 			console.log(`state changed: ${id} => ${state.val}`);
@@ -84,21 +85,34 @@ export class Root extends React.Component<any, { tvInfo: TVInfo }> {
 		return (
 			<>
 				<Header />
-				<Settings settings={this.props.settings} onChange={this.props.onSettingsChanged} tvInfo={this.state.tvInfo} />
+				<Settings settings={this.state.settings} onChange={this.props.onSettingsChanged} tvInfo={this.state.tvInfo} />
 			</>
 		);
 	}
 
 }
 
-let curSettings: any;
+let curSettings: Record<string, any>;
+let originalSettings: Record<string, any>;
+
+/**
+ * Checks if any setting was changed
+ */
+function hasChanges(): boolean {
+	for (const key of Object.keys(originalSettings)) {
+		if (originalSettings[key] !== curSettings[key]) return true;
+	}
+	return false;
+}
 
 // the function loadSettings has to exist ...
 $window.load = (settings, onChange) => {
 
-	const settingsChanged: OnSettingsChangedCallback = (newSettings, hasChanges: boolean) => {
+	originalSettings = settings;
+
+	const settingsChanged: OnSettingsChangedCallback = (newSettings) => {
 		curSettings = newSettings;
-		onChange(hasChanges);
+		onChange(hasChanges());
 	};
 
 	ReactDOM.render(
@@ -115,4 +129,5 @@ $window.load = (settings, onChange) => {
 $window.save = (callback) => {
 	// save the settings
 	callback(curSettings);
+	originalSettings = curSettings;
 };

@@ -12,6 +12,8 @@
         // "noUnusedLocals": true,
         // "noUnusedParameters": true,
         
+        "jsx": "react",
+        
         "sourceMap": false,
         "inlineSourceMap": false,
         //"sourceRoot": "src/",

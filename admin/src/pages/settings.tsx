@@ -4,7 +4,7 @@ import * as ReactDOM from "react-dom";
 import { APIVersion } from "../../../src/api";
 import {$$, $window, _, instance} from "../lib/adapter";
 
-export type OnSettingsChangedCallback = (newSettings: Record<string, any>, hasChanges: boolean) => void;
+export type OnSettingsChangedCallback = (newSettings: Record<string, any>) => void;
 export interface TVInfo {
 	apiVersion: APIVersion | "not found";
 	requiresPairing?: boolean;
@@ -51,7 +51,7 @@ export class Settings extends React.Component<SettingsProps, Record<string, any>
 		// store the setting
 		this.putSetting(target.id, target.value, () => {
 			// and notify the admin UI about changes
-			this.props.onChange(this.state, this.hasChanges());
+			this.props.onChange(this.state);
 		});
 	}
 
@@ -68,20 +68,6 @@ export class Settings extends React.Component<SettingsProps, Record<string, any>
 	 */
 	private putSetting(key: string, value: string | number | string[], callback?: () => void): void {
 		this.setState({[key]: value as any}, callback);
-	}
-
-	/**
-	 * Checks if any setting was changed
-	 */
-	private hasChanges(): boolean {
-		for (const key of Object.keys(this.originalSettings)) {
-			if (this.originalSettings[key] !== this.state[key]) return true;
-		}
-		return false;
-	}
-
-	public onSave(): any {
-		return this.state;
 	}
 
 	public render() {

@@ -32,12 +32,13 @@ class Root extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            settings: this.props.settings,
             tvInfo: null,
         };
     }
     componentDidMount() {
         // subscribe to the TV state
-        adapter_1.socket.emit("subscribeStates", namespace + ".info.*");
+        adapter_1.socket.emit("subscribe", namespace + ".info.*");
         adapter_1.socket.on("stateChange", (id, state) => {
             if (id.substring(0, namespace.length) !== namespace)
                 return;
@@ -87,16 +88,28 @@ class Root extends React.Component {
     render() {
         return (React.createElement(React.Fragment, null,
             React.createElement(Header, null),
-            React.createElement(settings_1.Settings, { settings: this.props.settings, onChange: this.props.onSettingsChanged, tvInfo: this.state.tvInfo })));
+            React.createElement(settings_1.Settings, { settings: this.state.settings, onChange: this.props.onSettingsChanged, tvInfo: this.state.tvInfo })));
     }
 }
 exports.Root = Root;
 let curSettings;
+let originalSettings;
+/**
+ * Checks if any setting was changed
+ */
+function hasChanges() {
+    for (const key of Object.keys(originalSettings)) {
+        if (originalSettings[key] !== curSettings[key])
+            return true;
+    }
+    return false;
+}
 // the function loadSettings has to exist ...
 adapter_1.$window.load = (settings, onChange) => {
-    const settingsChanged = (newSettings, hasChanges) => {
+    originalSettings = settings;
+    const settingsChanged = (newSettings) => {
         curSettings = newSettings;
-        onChange(hasChanges);
+        onChange(hasChanges());
     };
     ReactDOM.render(React.createElement(Root, { settings: settings, onSettingsChanged: settingsChanged }), document.getElementById("adapter-container"));
     // Signal to admin, that no changes yet
@@ -107,6 +120,7 @@ adapter_1.$window.load = (settings, onChange) => {
 adapter_1.$window.save = (callback) => {
     // save the settings
     callback(curSettings);
+    originalSettings = curSettings;
 };
 
 
@@ -162,7 +176,7 @@ class Settings extends React.Component {
         // store the setting
         this.putSetting(target.id, target.value, () => {
             // and notify the admin UI about changes
-            this.props.onChange(this.state, this.hasChanges());
+            this.props.onChange(this.state);
         });
     }
     /**
@@ -178,19 +192,6 @@ class Settings extends React.Component {
      */
     putSetting(key, value, callback) {
         this.setState({ [key]: value }, callback);
-    }
-    /**
-     * Checks if any setting was changed
-     */
-    hasChanges() {
-        for (const key of Object.keys(this.originalSettings)) {
-            if (this.originalSettings[key] !== this.state[key])
-                return true;
-        }
-        return false;
-    }
-    onSave() {
-        return this.state;
     }
     render() {
         console.log("rendering... this.props.tvInfo = " + JSON.stringify(this.props.tvInfo));
