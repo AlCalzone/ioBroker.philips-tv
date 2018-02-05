@@ -1,10 +1,10 @@
 /**
  * Sets up a DOM for react component tests
  */
-const JSDOM = require('jsdom').JSDOM;
+const { JSDOM } = require('jsdom');
 
 const jsdom = new JSDOM('<!doctype html><html><body></body></html>');
-const window = jsdom.window;
+const { window } = jsdom;
 
 function copyProps(src, target) {
   const props = Object.getOwnPropertyNames(src)
