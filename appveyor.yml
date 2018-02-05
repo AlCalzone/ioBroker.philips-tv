@@ -17,5 +17,5 @@ test_script:
   - echo %cd%
   - node --version
   - npm --version
-  - npm test
+  - if "%nodejs_version:~0,1%" == "4" (npm run test:ts && npm run test:js) else (npm test)
 build: 'off'

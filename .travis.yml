@@ -9,6 +9,13 @@ node_js:
 before_script:
   - npm install winston@2.3.1
   - 'npm install https://github.com/ioBroker/ioBroker.js-controller/tarball/master --production'
+script:
+  - node_version=$(node -v);
+  - if [ ${node_version:1:1} == '4' ];
+    then npm run test:ts && npm run test:js;
+    else npm test;
+    fi
+
 env:
   - CXX=g++-4.8
 addons:
