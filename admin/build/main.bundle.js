@@ -57,6 +57,11 @@ class Root extends React.Component {
                 this.setState({ tvInfo });
             }
         });
+        // and unsubscribe when the window gets unloaded
+        adapter_1.$$(window).on("beforeunload", () => {
+            adapter_1.socket.emit("unsubscribe", namespace + ".info.*");
+            return null;
+        });
         // wait for the adapter to get the TV's information
         this.updateTVInfo();
     }

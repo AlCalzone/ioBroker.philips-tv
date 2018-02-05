@@ -53,6 +53,11 @@ export class Root extends React.Component<any, { tvInfo: TVInfo, settings: Recor
 				this.setState({ tvInfo });
 			}
 		});
+		// and unsubscribe when the window gets unloaded
+		$$(window).on("beforeunload", () => {
+			socket.emit("unsubscribe", namespace + ".info.*");
+			return null;
+		});
 
 		// wait for the adapter to get the TV's information
 		this.updateTVInfo();
