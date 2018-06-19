@@ -26,7 +26,32 @@ export interface Credentials {
 	password: string;
 }
 
-// TODO all the request methods can be refactored
+const RETRY_OPTIONS = {
+	maxTries: 3,
+	retryDelay: 200,
+	retryBackoffFactor: 2,
+	recoverableErrors: ["ETIMEDOUT", "ESOCKETTIMEDOUT"],
+};
+
+/** Retries a request on recoverable errors */
+async function retry<T>(requestMethod: () => Promise<T>): Promise<T> {
+	let ret: T;
+	for (let i = 1; i <= RETRY_OPTIONS.maxTries; i++) {
+		try {
+			ret = await requestMethod();
+			return ret;
+		} catch (e) {
+			if (i < RETRY_OPTIONS.maxTries && RETRY_OPTIONS.recoverableErrors.indexOf(e.code) > -1) {
+				// wait a bit
+				const waitTime = RETRY_OPTIONS.retryDelay * RETRY_OPTIONS.retryBackoffFactor ** (i - 1);
+				await wait(waitTime);
+				// now try again
+			} else {
+				throw e;
+			}
+		}
+	}
+}
 
 /** Performs a GET request on the given resource and returns the result */
 async function request_get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
@@ -34,7 +59,7 @@ async function request_get(path: string, options: RequestOptions = {}): Promise<
 		uri: path,
 		rejectUnauthorized: false,
 	});
-	return request(reqOpts) as any as Promise<string | FullResponse>;
+	return retry(() => request(reqOpts) as any as Promise<string | FullResponse>);
 }
 
 async function checkConnection(hostname: string): Promise<boolean> {
@@ -132,7 +157,7 @@ export abstract class API {
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: this.getRequestPath(path),
 		});
-		return request(reqOpts) as any as Promise<string | FullResponse>;
+		return retry(() => request(reqOpts) as any as Promise<string | FullResponse>);
 	}
 
 	/** Performs a GET request on the given resource and returns the result */
@@ -150,7 +175,7 @@ export abstract class API {
 				sendImmediately: false,
 			},
 		});
-		return request(reqOpts) as any as Promise<string | FullResponse>;
+		return retry(() => request(reqOpts) as any as Promise<string | FullResponse>);
 	}
 
 	/** Posts JSON data to the given resource and returns the result */
@@ -165,7 +190,7 @@ export abstract class API {
 				sendImmediately: false,
 			},
 		});
-		return request(reqOpts) as any as Promise<string>;
+		return retry(() => request(reqOpts) as any as Promise<string>);
 	}
 
 	/** Posts JSON data to the given resource and returns the result */
@@ -175,7 +200,7 @@ export abstract class API {
 			method: "POST",
 			json: jsonPayload,
 		});
-		return request(reqOpts) as any as Promise<string>;
+		return retry(() => request(reqOpts) as any as Promise<string>);
 	}
 
 	/** Checks if the configured host is reachable */

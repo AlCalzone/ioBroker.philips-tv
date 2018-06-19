@@ -1,4 +1,3 @@
-/// <reference types="request-promise-native" />
 import { FullResponse, RequestPromiseOptions as RequestOptions } from "request-promise-native";
 import { API, APIVersion, Credentials } from "./index";
 export declare class APIv6 extends API {
@@ -7,8 +6,8 @@ export declare class APIv6 extends API {
     /** Tests if a given hostname supports this API version */
     protected test(): Promise<boolean>;
     /** Creates a new device id or retrieves a stored one */
-    private getDeviceID();
-    private getDeviceSpec();
+    private getDeviceID;
+    private getDeviceSpec;
     private pairingContext;
     readonly requiresPairing: boolean;
     startPairing(): Promise<void>;

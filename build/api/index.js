@@ -14,8 +14,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
         while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
                 case 0: case 1: t = op; break;
                 case 4: _.label++; return { value: op[1], done: false };
@@ -46,7 +46,48 @@ var request = requestPackage.defaults({
 });
 var global_1 = require("../lib/global");
 var promises_1 = require("../lib/promises");
-// TODO all the request methods can be refactored
+var RETRY_OPTIONS = {
+    maxTries: 3,
+    retryDelay: 200,
+    retryBackoffFactor: 2,
+    recoverableErrors: ["ETIMEDOUT", "ESOCKETTIMEDOUT"],
+};
+/** Retries a request on recoverable errors */
+function retry(requestMethod) {
+    return __awaiter(this, void 0, void 0, function () {
+        var ret, i, e_1, waitTime;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    i = 1;
+                    _a.label = 1;
+                case 1:
+                    if (!(i <= RETRY_OPTIONS.maxTries)) return [3 /*break*/, 9];
+                    _a.label = 2;
+                case 2:
+                    _a.trys.push([2, 4, , 8]);
+                    return [4 /*yield*/, requestMethod()];
+                case 3:
+                    ret = _a.sent();
+                    return [2 /*return*/, ret];
+                case 4:
+                    e_1 = _a.sent();
+                    if (!(i < RETRY_OPTIONS.maxTries && RETRY_OPTIONS.recoverableErrors.indexOf(e_1.code) > -1)) return [3 /*break*/, 6];
+                    waitTime = RETRY_OPTIONS.retryDelay * Math.pow(RETRY_OPTIONS.retryBackoffFactor, (i - 1));
+                    return [4 /*yield*/, promises_1.wait(waitTime)];
+                case 5:
+                    _a.sent();
+                    return [3 /*break*/, 7];
+                case 6: throw e_1;
+                case 7: return [3 /*break*/, 8];
+                case 8:
+                    i++;
+                    return [3 /*break*/, 1];
+                case 9: return [2 /*return*/];
+            }
+        });
+    });
+}
 /** Performs a GET request on the given resource and returns the result */
 function request_get(path, options) {
     if (options === void 0) { options = {}; }
@@ -57,13 +98,13 @@ function request_get(path, options) {
                 uri: path,
                 rejectUnauthorized: false,
             });
-            return [2 /*return*/, request(reqOpts)];
+            return [2 /*return*/, retry(function () { return request(reqOpts); })];
         });
     });
 }
 function checkConnection(hostname) {
     return __awaiter(this, void 0, void 0, function () {
-        var e_1;
+        var e_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -83,9 +124,9 @@ function checkConnection(hostname) {
                     global_1.Global.log("connection is ALIVE", "debug");
                     return [2 /*return*/, true];
                 case 3:
-                    e_1 = _a.sent();
+                    e_2 = _a.sent();
                     // handle a couple of possible errors
-                    switch (e_1.code) {
+                    switch (e_2.code) {
                         case "ECONNREFUSED":
                         case "ECONNRESET":
                             // the remote host is there, but it won't let us connect
@@ -94,7 +135,7 @@ function checkConnection(hostname) {
                             return [2 /*return*/, true];
                         case "ETIMEDOUT":
                         default:
-                            global_1.Global.log("connection is DEAD. Reason: [" + e_1.code + "] " + e_1.message, "debug");
+                            global_1.Global.log("connection is DEAD. Reason: [" + e_2.code + "] " + e_2.message, "debug");
                             return [2 /*return*/, false];
                     }
                     return [3 /*break*/, 4];
@@ -167,7 +208,7 @@ var API = /** @class */ (function () {
         var reqOpts = Object.assign(options, {
             uri: this.getRequestPath(path),
         });
-        return request(reqOpts);
+        return retry(function () { return request(reqOpts); });
     };
     /** Performs a GET request on the given resource and returns the result */
     API.prototype.get = function (path, options) {
@@ -185,7 +226,7 @@ var API = /** @class */ (function () {
                 sendImmediately: false,
             },
         });
-        return request(reqOpts);
+        return retry(function () { return request(reqOpts); });
     };
     /** Posts JSON data to the given resource and returns the result */
     API.prototype.postJSONwithDigestAuth = function (path, credentials, jsonPayload, options) {
@@ -200,7 +241,7 @@ var API = /** @class */ (function () {
                 sendImmediately: false,
             },
         });
-        return request(reqOpts);
+        return retry(function () { return request(reqOpts); });
     };
     /** Posts JSON data to the given resource and returns the result */
     API.prototype.postJSON = function (path, jsonPayload, options) {
@@ -210,7 +251,7 @@ var API = /** @class */ (function () {
             method: "POST",
             json: jsonPayload,
         });
-        return request(reqOpts);
+        return retry(function () { return request(reqOpts); });
     };
     /** Checks if the configured host is reachable */
     API.prototype.checkConnection = function () {

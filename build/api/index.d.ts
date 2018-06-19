@@ -1,4 +1,3 @@
-/// <reference types="request-promise-native" />
 import { FullResponse, RequestPromiseOptions as RequestOptions } from "request-promise-native";
 export declare type APIVersion = "unknown" | "v1" | "v5" | "v6";
 export interface Credentials {
@@ -12,15 +11,15 @@ export declare abstract class API {
     /** The hostname this wrapper is bound to */
     readonly hostname: string;
     protected constructor(
-        /** The hostname this wrapper is bound to */
-        hostname: string);
+    /** The hostname this wrapper is bound to */
+    hostname: string);
     static create(hostname: string): Promise<API | undefined>;
     /** Tests if a given hostname supports this API version */
     protected abstract test(): Promise<boolean>;
     /** Determines which API version this wrapper represents */
-    readonly abstract version: APIVersion;
+    abstract readonly version: APIVersion;
     /** Whether this API is only usable after pairing */
-    readonly abstract requiresPairing: boolean;
+    abstract readonly requiresPairing: boolean;
     /** Start a pairing process */
     abstract startPairing(): Promise<void>;
     /** Start a pairing process and return the required data to complete it */
@@ -33,9 +32,9 @@ export declare abstract class API {
     private _params;
     /** Additional params that should be stored over several API uses */
     readonly params: Map<string, any>;
-    private getRequestPath(path);
+    private getRequestPath;
     /** Performs a GET request on the given resource and returns the result */
-    private _get(path, options?);
+    private _get;
     /** Performs a GET request on the given resource and returns the result */
     get(path: string, options?: RequestOptions): Promise<string | FullResponse>;
     /** Performs a GET request on the given resource and returns the result */

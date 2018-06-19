@@ -23,7 +23,8 @@
             "dom" // <= necessary to get rid of @types/jquery errors
         ],
         
-        "strictPropertyInitialization": true
+        // "strictPropertyInitialization": true,
+        // "strictNullChecks": true
     },
     "include": [
         "src/**/*.ts"
