@@ -364,13 +364,12 @@ function updateTVInfo(info) {
 }
 function pingThread() {
     return __awaiter(this, void 0, void 0, function () {
-        var oldValue, retry, isPaired, e_3;
+        var oldValue, isPaired, e_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     oldValue = connectionAlive;
                     if (!(api == null)) return [3 /*break*/, 10];
-                    retry = true;
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 7, , 9]);
@@ -385,8 +384,8 @@ function pingThread() {
                 case 3:
                     _a.sent();
                     connectionAlive = false;
-                    retry = false;
-                    return [3 /*break*/, 6];
+                    // don't retry, we don't support this TV
+                    return [2 /*return*/];
                 case 4:
                     isPaired = (credentials.username !== "" || credentials.password !== "");
                     return [4 /*yield*/, updateTVInfo({
@@ -396,15 +395,19 @@ function pingThread() {
                         })];
                 case 5:
                     _a.sent();
-                    if (api.requiresPairing && !isPaired) {
-                        adapter.log.warn("The TV at " + hostname + " needs to be paired before you can use the adapter. Go to the adapter config to continue!");
-                        connectionAlive = false;
-                        retry = false;
+                    if (api.requiresPairing) {
+                        if (isPaired) {
+                            // we have credentials, so use them
+                            api.provideCredentials(credentials);
+                        }
+                        else {
+                            adapter.log.warn("The TV at " + hostname + " needs to be paired before you can use the adapter. Go to the adapter config to continue!");
+                            connectionAlive = false;
+                            // don't retry, we need to wait for the pairing
+                            return [2 /*return*/];
+                        }
                     }
-                    else {
-                        // all good
-                        connectionAlive = true;
-                    }
+                    connectionAlive = true;
                     _a.label = 6;
                 case 6: return [3 /*break*/, 9];
                 case 7:
@@ -415,11 +418,7 @@ function pingThread() {
                     adapter.log.debug("Could not initialize connection. Reason: " + e_3.message);
                     connectionAlive = false;
                     return [3 /*break*/, 9];
-                case 9:
-                    // if there's no hope of creating a connection, stop
-                    if (!retry)
-                        return [2 /*return*/];
-                    return [3 /*break*/, 12];
+                case 9: return [3 /*break*/, 12];
                 case 10: return [4 /*yield*/, api.checkConnection()];
                 case 11:
                     connectionAlive = _a.sent();

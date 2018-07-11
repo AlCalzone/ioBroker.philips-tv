@@ -1,6 +1,6 @@
 {
   "name": "iobroker.philips-tv",
-  "version": "0.3.0-alpha6",
+  "version": "0.3.0-alpha7",
   "description": "ioBroker adapter to control Philips TVs over the network",
   "author": {
     "name": "AlCalzone",
