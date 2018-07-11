@@ -38,15 +38,21 @@ async function retry<T>(requestMethod: () => Promise<T>): Promise<T> {
 	let ret: T;
 	for (let i = 1; i <= RETRY_OPTIONS.maxTries; i++) {
 		try {
+			_.log(`  attempt ${i} of ${RETRY_OPTIONS.maxTries}`, "debug");
 			ret = await requestMethod();
 			return ret;
 		} catch (e) {
+			const isRecoverable = RETRY_OPTIONS.recoverableErrors.indexOf(e.code) > -1;
+			_.log(`  attempt ${i} failed with code ${e.code}`, "debug");
+			_.log(`  error is ${isRecoverable ? "" : "not "} recoverable`, "debug");
 			if (i < RETRY_OPTIONS.maxTries && RETRY_OPTIONS.recoverableErrors.indexOf(e.code) > -1) {
 				// wait a bit
 				const waitTime = RETRY_OPTIONS.retryDelay * RETRY_OPTIONS.retryBackoffFactor ** (i - 1);
+				_.log(`  waiting ${waitTime} ms`, "debug");
 				await wait(waitTime);
 				// now try again
 			} else {
+				_.log(`  no further attempts`, "debug");
 				throw e;
 			}
 		}
@@ -154,6 +160,7 @@ export abstract class API {
 
 	/** Performs a GET request on the given resource and returns the result */
 	private _get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
+		_.log(`get("${path}")`, "debug");
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: this.getRequestPath(path),
 		});
@@ -167,6 +174,7 @@ export abstract class API {
 
 	/** Performs a GET request on the given resource and returns the result */
 	public getWithDigestAuth(path: string, credentials: Credentials, options: RequestOptions = {}): Promise<string | FullResponse> {
+		_.log(`getWithDigestAuth("${path}")`, "debug");
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: this.getRequestPath(path),
 			auth: {
@@ -180,6 +188,7 @@ export abstract class API {
 
 	/** Posts JSON data to the given resource and returns the result */
 	public postJSONwithDigestAuth(path: string, credentials: Credentials, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
+		_.log(`postJSONwithDigestAuth("${path}", ${JSON.stringify(jsonPayload)})`, "debug");
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: this.getRequestPath(path),
 			method: "POST",
@@ -195,6 +204,7 @@ export abstract class API {
 
 	/** Posts JSON data to the given resource and returns the result */
 	public postJSON(path: string, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
+		_.log(`postJSON("${path}", ${JSON.stringify(jsonPayload)})`, "debug");
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: this.getRequestPath(path),
 			method: "POST",

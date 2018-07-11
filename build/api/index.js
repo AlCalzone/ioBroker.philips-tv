@@ -55,7 +55,7 @@ var RETRY_OPTIONS = {
 /** Retries a request on recoverable errors */
 function retry(requestMethod) {
     return __awaiter(this, void 0, void 0, function () {
-        var ret, i, e_1, waitTime;
+        var ret, i, e_1, isRecoverable, waitTime;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -66,19 +66,26 @@ function retry(requestMethod) {
                     _a.label = 2;
                 case 2:
                     _a.trys.push([2, 4, , 8]);
+                    global_1.Global.log("  attempt " + i + " of " + RETRY_OPTIONS.maxTries, "debug");
                     return [4 /*yield*/, requestMethod()];
                 case 3:
                     ret = _a.sent();
                     return [2 /*return*/, ret];
                 case 4:
                     e_1 = _a.sent();
+                    isRecoverable = RETRY_OPTIONS.recoverableErrors.indexOf(e_1.code) > -1;
+                    global_1.Global.log("  attempt " + i + " failed with code " + e_1.code, "debug");
+                    global_1.Global.log("  error is " + (isRecoverable ? "" : "not ") + " recoverable", "debug");
                     if (!(i < RETRY_OPTIONS.maxTries && RETRY_OPTIONS.recoverableErrors.indexOf(e_1.code) > -1)) return [3 /*break*/, 6];
                     waitTime = RETRY_OPTIONS.retryDelay * Math.pow(RETRY_OPTIONS.retryBackoffFactor, (i - 1));
+                    global_1.Global.log("  waiting " + waitTime + " ms", "debug");
                     return [4 /*yield*/, promises_1.wait(waitTime)];
                 case 5:
                     _a.sent();
                     return [3 /*break*/, 7];
-                case 6: throw e_1;
+                case 6:
+                    global_1.Global.log("  no further attempts", "debug");
+                    throw e_1;
                 case 7: return [3 /*break*/, 8];
                 case 8:
                     i++;
@@ -205,6 +212,7 @@ var API = /** @class */ (function () {
     /** Performs a GET request on the given resource and returns the result */
     API.prototype._get = function (path, options) {
         if (options === void 0) { options = {}; }
+        global_1.Global.log("get(\"" + path + "\")", "debug");
         var reqOpts = Object.assign(options, {
             uri: this.getRequestPath(path),
         });
@@ -218,6 +226,7 @@ var API = /** @class */ (function () {
     /** Performs a GET request on the given resource and returns the result */
     API.prototype.getWithDigestAuth = function (path, credentials, options) {
         if (options === void 0) { options = {}; }
+        global_1.Global.log("getWithDigestAuth(\"" + path + "\")", "debug");
         var reqOpts = Object.assign(options, {
             uri: this.getRequestPath(path),
             auth: {
@@ -231,6 +240,7 @@ var API = /** @class */ (function () {
     /** Posts JSON data to the given resource and returns the result */
     API.prototype.postJSONwithDigestAuth = function (path, credentials, jsonPayload, options) {
         if (options === void 0) { options = {}; }
+        global_1.Global.log("postJSONwithDigestAuth(\"" + path + "\", " + JSON.stringify(jsonPayload) + ")", "debug");
         var reqOpts = Object.assign(options, {
             uri: this.getRequestPath(path),
             method: "POST",
@@ -246,6 +256,7 @@ var API = /** @class */ (function () {
     /** Posts JSON data to the given resource and returns the result */
     API.prototype.postJSON = function (path, jsonPayload, options) {
         if (options === void 0) { options = {}; }
+        global_1.Global.log("postJSON(\"" + path + "\", " + JSON.stringify(jsonPayload) + ")", "debug");
         var reqOpts = Object.assign(options, {
             uri: this.getRequestPath(path),
             method: "POST",

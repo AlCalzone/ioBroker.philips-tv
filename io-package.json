@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "philips-tv",
-        "version": "0.3.0-alpha5",
+        "version": "0.3.0-alpha6",
         "news": {
             "0.3.0-alpha4": {
                 "en": "Support for TVs with API v5",
