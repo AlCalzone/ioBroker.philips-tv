@@ -1,17 +1,15 @@
+import * as http from "http";
+import * as https from "https";
 import * as requestPackage from "request-promise-native";
 
 const request = requestPackage.defaults({
 	timeout: 5000, // don't wait forever
 	rejectUnauthorized: false, // enable self-signed certs
-	agent: false,
-	pool: {
-		maxSockets: 1000,
-	},
 } as any as requestPackage.RequestPromiseOptions);
 
 import { FullResponse, OptionsWithUri, RequestPromiseOptions as RequestOptions } from "request-promise-native";
 
-import { ExtendedAdapter, Global as _ } from "../lib/global";
+import { Global as _ } from "../lib/global";
 import { wait } from "../lib/promises";
 
 export type APIVersion =
@@ -32,6 +30,25 @@ const RETRY_OPTIONS = {
 	retryBackoffFactor: 2,
 	recoverableErrors: ["ETIMEDOUT", "ESOCKETTIMEDOUT"],
 };
+
+const httpAgent = new http.Agent({
+	keepAlive: true,
+	keepAliveMsecs: 10000,
+	maxSockets: 1,
+});
+const httpsAgent = new https.Agent({
+	keepAlive: true,
+	keepAliveMsecs: 10000,
+	maxSockets: 1,
+	rejectUnauthorized: false,
+});
+
+function getAgent(path: string): http.Agent | https.Agent {
+	return path.startsWith("https")
+		? httpsAgent
+		: httpAgent
+	;
+}
 
 /** Retries a request on recoverable errors */
 async function retry<T>(requestMethod: () => Promise<T>): Promise<T> {
@@ -64,6 +81,7 @@ async function request_get(path: string, options: RequestOptions = {}): Promise<
 	const reqOpts: OptionsWithUri = Object.assign(options, {
 		uri: path,
 		rejectUnauthorized: false,
+		agent: getAgent(path),
 	});
 	return retry(() => request(reqOpts) as any as Promise<string | FullResponse>);
 }
@@ -163,6 +181,7 @@ export abstract class API {
 		_.log(`get("${path}")`, "debug");
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: this.getRequestPath(path),
+			agent: getAgent(path),
 		});
 		return retry(() => request(reqOpts) as any as Promise<string | FullResponse>);
 	}
@@ -177,6 +196,7 @@ export abstract class API {
 		_.log(`getWithDigestAuth("${path}")`, "debug");
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: this.getRequestPath(path),
+			agent: getAgent(path),
 			auth: {
 				username: credentials.username,
 				password: credentials.password,
@@ -191,6 +211,7 @@ export abstract class API {
 		_.log(`postJSONwithDigestAuth("${path}", ${JSON.stringify(jsonPayload)})`, "debug");
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: this.getRequestPath(path),
+			agent: getAgent(path),
 			method: "POST",
 			json: jsonPayload,
 			auth: {
@@ -207,6 +228,7 @@ export abstract class API {
 		_.log(`postJSON("${path}", ${JSON.stringify(jsonPayload)})`, "debug");
 		const reqOpts: OptionsWithUri = Object.assign(options, {
 			uri: this.getRequestPath(path),
+			agent: getAgent(path),
 			method: "POST",
 			json: jsonPayload,
 		});

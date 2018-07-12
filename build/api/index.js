@@ -35,14 +35,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var http = require("http");
+var https = require("https");
 var requestPackage = require("request-promise-native");
 var request = requestPackage.defaults({
     timeout: 5000,
     rejectUnauthorized: false,
-    agent: false,
-    pool: {
-        maxSockets: 1000,
-    },
 });
 var global_1 = require("../lib/global");
 var promises_1 = require("../lib/promises");
@@ -52,6 +50,22 @@ var RETRY_OPTIONS = {
     retryBackoffFactor: 2,
     recoverableErrors: ["ETIMEDOUT", "ESOCKETTIMEDOUT"],
 };
+var httpAgent = new http.Agent({
+    keepAlive: true,
+    keepAliveMsecs: 10000,
+    maxSockets: 1,
+});
+var httpsAgent = new https.Agent({
+    keepAlive: true,
+    keepAliveMsecs: 10000,
+    maxSockets: 1,
+    rejectUnauthorized: false,
+});
+function getAgent(path) {
+    return path.startsWith("https")
+        ? httpsAgent
+        : httpAgent;
+}
 /** Retries a request on recoverable errors */
 function retry(requestMethod) {
     return __awaiter(this, void 0, void 0, function () {
@@ -104,6 +118,7 @@ function request_get(path, options) {
             reqOpts = Object.assign(options, {
                 uri: path,
                 rejectUnauthorized: false,
+                agent: getAgent(path),
             });
             return [2 /*return*/, retry(function () { return request(reqOpts); })];
         });
@@ -215,6 +230,7 @@ var API = /** @class */ (function () {
         global_1.Global.log("get(\"" + path + "\")", "debug");
         var reqOpts = Object.assign(options, {
             uri: this.getRequestPath(path),
+            agent: getAgent(path),
         });
         return retry(function () { return request(reqOpts); });
     };
@@ -229,6 +245,7 @@ var API = /** @class */ (function () {
         global_1.Global.log("getWithDigestAuth(\"" + path + "\")", "debug");
         var reqOpts = Object.assign(options, {
             uri: this.getRequestPath(path),
+            agent: getAgent(path),
             auth: {
                 username: credentials.username,
                 password: credentials.password,
@@ -243,6 +260,7 @@ var API = /** @class */ (function () {
         global_1.Global.log("postJSONwithDigestAuth(\"" + path + "\", " + JSON.stringify(jsonPayload) + ")", "debug");
         var reqOpts = Object.assign(options, {
             uri: this.getRequestPath(path),
+            agent: getAgent(path),
             method: "POST",
             json: jsonPayload,
             auth: {
@@ -259,6 +277,7 @@ var API = /** @class */ (function () {
         global_1.Global.log("postJSON(\"" + path + "\", " + JSON.stringify(jsonPayload) + ")", "debug");
         var reqOpts = Object.assign(options, {
             uri: this.getRequestPath(path),
+            agent: getAgent(path),
             method: "POST",
             json: jsonPayload,
         });
