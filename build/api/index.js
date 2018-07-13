@@ -228,8 +228,10 @@ var API = /** @class */ (function () {
     API.prototype._get = function (path, options) {
         if (options === void 0) { options = {}; }
         global_1.Global.log("get(\"" + path + "\")", "debug");
+        // normalize path
+        path = this.getRequestPath(path);
         var reqOpts = Object.assign(options, {
-            uri: this.getRequestPath(path),
+            uri: path,
             agent: getAgent(path),
         });
         return retry(function () { return request(reqOpts); });
@@ -243,8 +245,10 @@ var API = /** @class */ (function () {
     API.prototype.getWithDigestAuth = function (path, credentials, options) {
         if (options === void 0) { options = {}; }
         global_1.Global.log("getWithDigestAuth(\"" + path + "\")", "debug");
+        // normalize path
+        path = this.getRequestPath(path);
         var reqOpts = Object.assign(options, {
-            uri: this.getRequestPath(path),
+            uri: path,
             agent: getAgent(path),
             auth: {
                 username: credentials.username,
@@ -258,8 +262,10 @@ var API = /** @class */ (function () {
     API.prototype.postJSONwithDigestAuth = function (path, credentials, jsonPayload, options) {
         if (options === void 0) { options = {}; }
         global_1.Global.log("postJSONwithDigestAuth(\"" + path + "\", " + JSON.stringify(jsonPayload) + ")", "debug");
+        // normalize path
+        path = this.getRequestPath(path);
         var reqOpts = Object.assign(options, {
-            uri: this.getRequestPath(path),
+            uri: path,
             agent: getAgent(path),
             method: "POST",
             json: jsonPayload,
@@ -275,8 +281,10 @@ var API = /** @class */ (function () {
     API.prototype.postJSON = function (path, jsonPayload, options) {
         if (options === void 0) { options = {}; }
         global_1.Global.log("postJSON(\"" + path + "\", " + JSON.stringify(jsonPayload) + ")", "debug");
+        // normalize path
+        path = this.getRequestPath(path);
         var reqOpts = Object.assign(options, {
-            uri: this.getRequestPath(path),
+            uri: path,
             agent: getAgent(path),
             method: "POST",
             json: jsonPayload,

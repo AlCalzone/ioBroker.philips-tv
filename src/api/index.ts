@@ -179,8 +179,10 @@ export abstract class API {
 	/** Performs a GET request on the given resource and returns the result */
 	private _get(path: string, options: RequestOptions = {}): Promise<string | FullResponse> {
 		_.log(`get("${path}")`, "debug");
+		// normalize path
+		path = this.getRequestPath(path);
 		const reqOpts: OptionsWithUri = Object.assign(options, {
-			uri: this.getRequestPath(path),
+			uri: path,
 			agent: getAgent(path),
 		});
 		return retry(() => request(reqOpts) as any as Promise<string | FullResponse>);
@@ -194,8 +196,10 @@ export abstract class API {
 	/** Performs a GET request on the given resource and returns the result */
 	public getWithDigestAuth(path: string, credentials: Credentials, options: RequestOptions = {}): Promise<string | FullResponse> {
 		_.log(`getWithDigestAuth("${path}")`, "debug");
+		// normalize path
+		path = this.getRequestPath(path);
 		const reqOpts: OptionsWithUri = Object.assign(options, {
-			uri: this.getRequestPath(path),
+			uri: path,
 			agent: getAgent(path),
 			auth: {
 				username: credentials.username,
@@ -209,8 +213,10 @@ export abstract class API {
 	/** Posts JSON data to the given resource and returns the result */
 	public postJSONwithDigestAuth(path: string, credentials: Credentials, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
 		_.log(`postJSONwithDigestAuth("${path}", ${JSON.stringify(jsonPayload)})`, "debug");
+		// normalize path
+		path = this.getRequestPath(path);
 		const reqOpts: OptionsWithUri = Object.assign(options, {
-			uri: this.getRequestPath(path),
+			uri: path,
 			agent: getAgent(path),
 			method: "POST",
 			json: jsonPayload,
@@ -226,8 +232,10 @@ export abstract class API {
 	/** Posts JSON data to the given resource and returns the result */
 	public postJSON(path: string, jsonPayload: any, options: RequestOptions = {}): Promise<string> {
 		_.log(`postJSON("${path}", ${JSON.stringify(jsonPayload)})`, "debug");
+		// normalize path
+		path = this.getRequestPath(path);
 		const reqOpts: OptionsWithUri = Object.assign(options, {
-			uri: this.getRequestPath(path),
+			uri: path,
 			agent: getAgent(path),
 			method: "POST",
 			json: jsonPayload,
