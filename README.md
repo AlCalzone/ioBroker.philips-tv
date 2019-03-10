@@ -10,7 +10,7 @@ Windows: [![AppVeyor](https://ci.appveyor.com/api/projects/status/github/AlCalzo
 http://jointspace.sourceforge.net/projectdata/documentation/jasonApi/1/doc/API.html
 
 ## Changelog
-
+![Number of Installations](http://iobroker.live/badges/philips-tv-installed.svg) ![Number of Installations](http://iobroker.live/badges/philips-tv-stable.svg) 
 #### 0.2.0
 * (AlCalzone) Support sending key presses
 
