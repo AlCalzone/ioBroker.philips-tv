@@ -3,7 +3,7 @@ ioBroker.philips-tv
 =================
 
 **Tests:** Linux/Mac: [![Build Status](https://travis-ci.org/AlCalzone/ioBroker.philips-tv.svg?branch=master)](https://travis-ci.org/AlCalzone/ioBroker.philips-tv) 
-Windows: [![AppVeyor](https://ci.appveyor.com/api/projects/status/github/AlCalzone/ioBroker.philips-tv?branch=master&svg=true)](https://ci.appveyor.com/project/AlCalzone/ioBroker-philips-tv/)
+Windows: [![AppVeyor](https://ci.appveyor.com/api/projects/status/github/AlCalzone/ioBroker.philips-tv?branch=master&svg=true)](https://ci.appveyor.com/project/AlCalzone/ioBroker-philips-tv/) [![Greenkeeper badge](https://badges.greenkeeper.io/AlCalzone/ioBroker.philips-tv.svg)](https://greenkeeper.io/)
 
 ================
 
