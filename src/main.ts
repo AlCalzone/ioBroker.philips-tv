@@ -1,5 +1,3 @@
-import * as request from "request-promise-native";
-
 // Eigene Module laden
 import { API, APIVersion, Credentials } from "./api/index";
 import { ensureInstanceObjects } from "./lib/fix-objects";
@@ -96,7 +94,7 @@ function startAdapter(options: Partial<ioBroker.AdapterOptions> = {}) {
 			};
 			// make required parameters easier
 			function requireParams(...params: string[]) {
-				if (!(params && params.length)) return true;
+				if (!params.length) return true;
 				for (const param of params) {
 					if (!(obj.message && obj.message.hasOwnProperty(param))) {
 						respond(responses.MISSING_PARAMETER(param));

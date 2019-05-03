@@ -1,5 +1,4 @@
 // tslint:disable-next-line:no-reference
-/// <reference path="../../src/lib/ioBroker.d.ts" />
 
 // root objects
 import * as $ from "jquery";

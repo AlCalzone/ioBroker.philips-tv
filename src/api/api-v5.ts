@@ -1,4 +1,4 @@
-import { ExtendedAdapter, Global as _ } from "../lib/global";
+import { Global as _ } from "../lib/global";
 import { API, APIVersion, Credentials } from "./index";
 
 export class APIv5 extends API {

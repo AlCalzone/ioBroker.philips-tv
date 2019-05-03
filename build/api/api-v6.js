@@ -147,36 +147,29 @@ var APIv6 = /** @class */ (function (_super) {
     };
     APIv6.prototype.finishPairing = function (pinCode) {
         return __awaiter(this, void 0, void 0, function () {
-            var auth, requestPayload, credentials, response, _a, _b;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        if (this.pairingContext == null)
-                            throw new Error("No pairing process to finish!");
-                        auth = {
-                            auth_AppId: "1",
-                            pin: pinCode,
-                            auth_timestamp: this.pairingContext.timestamp,
-                            auth_signature: sign(Buffer.concat([
-                                secret,
-                                Buffer.from(this.pairingContext.timestamp, "utf8"),
-                                Buffer.from(pinCode, "utf8"),
-                            ])),
-                        };
-                        requestPayload = {
-                            auth: auth,
-                            device: this.getDeviceSpec(),
-                        };
-                        credentials = {
-                            username: this.getDeviceID(),
-                            password: this.pairingContext.auth_key,
-                        };
-                        _b = (_a = JSON).parse;
-                        return [4 /*yield*/, this.postJSONwithDigestAuth("pair/grant", credentials, requestPayload)];
-                    case 1:
-                        response = _b.apply(_a, [_c.sent()]);
-                        return [2 /*return*/, credentials];
-                }
+            var auth, requestPayload, credentials;
+            return __generator(this, function (_a) {
+                if (this.pairingContext == null)
+                    throw new Error("No pairing process to finish!");
+                auth = {
+                    auth_AppId: "1",
+                    pin: pinCode,
+                    auth_timestamp: this.pairingContext.timestamp,
+                    auth_signature: sign(Buffer.concat([
+                        secret,
+                        Buffer.from(this.pairingContext.timestamp, "utf8"),
+                        Buffer.from(pinCode, "utf8"),
+                    ])),
+                };
+                requestPayload = {
+                    auth: auth,
+                    device: this.getDeviceSpec(),
+                };
+                credentials = {
+                    username: this.getDeviceID(),
+                    password: this.pairingContext.auth_key,
+                };
+                return [2 /*return*/, credentials];
             });
         });
     };

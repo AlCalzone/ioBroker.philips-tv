@@ -116,7 +116,7 @@ function startAdapter(options) {
                 for (var _i = 0; _i < arguments.length; _i++) {
                     params[_i] = arguments[_i];
                 }
-                if (!(params && params.length))
+                if (!params.length)
                     return true;
                 for (var _a = 0, params_1 = params; _a < params_1.length; _a++) {
                     var param = params_1[_a];

@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
-import { FullResponse, OptionsWithUri, RequestPromiseOptions as RequestOptions } from "request-promise-native";
-import { ExtendedAdapter, Global as _ } from "../lib/global";
+import { FullResponse, RequestPromiseOptions as RequestOptions } from "request-promise-native";
+import { Global as _ } from "../lib/global";
 import { API, APIVersion, Credentials } from "./index";
 
 // see https://github.com/suborb/philips_android_tv/blob/master/philips.py for pairing procedure
@@ -105,7 +105,6 @@ export class APIv6 extends API {
 			username: this.getDeviceID(),
 			password: this.pairingContext.auth_key,
 		};
-		const response = JSON.parse(await this.postJSONwithDigestAuth("pair/grant", credentials, requestPayload));
 
 		return credentials;
 	}
