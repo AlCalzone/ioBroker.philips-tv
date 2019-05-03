@@ -3,11 +3,17 @@ import * as request from "request-promise-native";
 // Eigene Module laden
 import { ensureInstanceObjects } from "./lib/fix-objects";
 import { ExtendedAdapter, Global as _ } from "./lib/global";
-import { composeObject, DictionaryLike, entries, values } from "./lib/object-polyfill";
-// import { wait } from "./lib/promises";
 
 // Adapter-Utils laden
-import utils from "./lib/utils";
+import * as utils from "@iobroker/adapter-core";
+
+declare global {
+	namespace ioBroker {
+		interface AdapterConfig {
+			host: string;
+		}
+	}
+}
 
 // Objekte verwalten
 const objects = new Map<string, ioBroker.Object>();
@@ -15,128 +21,135 @@ const objects = new Map<string, ioBroker.Object>();
 let hostname: string;
 let requestPrefix: string;
 
-// Adapter-Objekt erstellen
-let adapter: ExtendedAdapter = utils.adapter({
-	name: "philips-tv",
+let adapter: ExtendedAdapter;
 
-	// Wird aufgerufen, wenn Adapter initialisiert wird
-	ready: async () => {
+function startAdapter(options: Partial<ioBroker.AdapterOptions> = {}) {
+	return adapter = utils.adapter({
+		// Default options
+		...options,	
 
-		// Adapter-Instanz global machen
-		adapter = _.extend(adapter);
-		_.adapter = adapter;
+		// Custom options
+		name: "philips-tv",
 
-		// Fix our adapter objects to repair incompatibilities between versions
-		await ensureInstanceObjects();
+		// Wird aufgerufen, wenn Adapter initialisiert wird
+		ready: async () => {
 
-		// we're not connected yet!
-		await adapter.setState("info.connection", false, true);
+			// Adapter-Instanz global machen
+			adapter = _.extend(adapter);
+			_.adapter = adapter;
 
-		// Sicherstellen, dass die Optionen vollständig ausgefüllt sind.
-		if (adapter.config && adapter.config.host != null && adapter.config.host !== "") {
-			// alles gut
-		} else {
-			adapter.log.error("Please set the connection params in the adapter options before starting the adapter!");
-			return;
-		}
-		hostname = (adapter.config.host as string).toLowerCase();
-		requestPrefix = `http://${hostname}:1925/1/`;
+			// Fix our adapter objects to repair incompatibilities between versions
+			await ensureInstanceObjects();
 
-		// watch own states
-		adapter.subscribeStates(`${adapter.namespace}.*`);
-		adapter.subscribeObjects(`${adapter.namespace}.*`);
+			// we're not connected yet!
+			await adapter.setState("info.connection", false, true);
 
-		setImmediate(pingThread);
-
-	},
-
-	// Handle sendTo-Messages
-	message: (obj: ioBroker.Message) => {
-		// TODO
-	},
-
-	objectChange: (id, obj) => {
-		_.log(`{{blue}} object with id ${id} ${obj ? "updated" : "deleted"}`, "debug");
-
-		if (id.startsWith(adapter.namespace)) {
-			// this is our own object.
-
-			if (obj) {
-				// object modified or added
-
-				// remember it
-				objects.set(id, obj);
+			// Sicherstellen, dass die Optionen vollständig ausgefüllt sind.
+			if (adapter.config && adapter.config.host != null && adapter.config.host !== "") {
+				// alles gut
 			} else {
-				// object deleted
-				if (objects.has(id)) objects.delete(id);
+				adapter.log.error("Please set the connection params in the adapter options before starting the adapter!");
+				return;
 			}
+			hostname = adapter.config.host.toLowerCase();
+			requestPrefix = `http://${hostname}:1925/1/`;
 
-		}
+			// watch own states
+			adapter.subscribeStates(`${adapter.namespace}.*`);
+			adapter.subscribeObjects(`${adapter.namespace}.*`);
 
-	},
+			setImmediate(pingThread);
 
-	stateChange: async (id, state) => {
-		if (state) {
-			_.log(`{{blue}} state with id ${id} updated: ack=${state.ack}; val=${state.val}`, "debug");
-		} else {
-			_.log(`{{blue}} state with id ${id} deleted`, "debug");
-		}
+		},
 
-		if (state && !state.ack && id.startsWith(adapter.namespace)) {
-			// our own state was changed from within ioBroker, react to it
+		// Handle sendTo-Messages
+		message: (obj: ioBroker.Message) => {
+			// TODO
+		},
 
-			const stateObj = objects.get(id);
-			let wasAcked: boolean = false;
-			let endpoint: string;
-			let payload: any;
-			if (/\.muted$/.test(id)) {
-				// mute/unmute the TV
-				endpoint = "audio/volume";
-				payload = { muted: state.val };
-			} else if (/\.volume$/.test(id)) {
-				// change the volume
-				endpoint = "audio/volume";
-				payload = { current: state.val };
-			} else if (/\.pressKey$/.test(id)) {
-				// send a key press to the TV
-				endpoint = "input/key";
-				payload = { key: state.val };
-			}
+		objectChange: (id, obj) => {
+			_.log(`{{blue}} object with id ${id} ${obj ? "updated" : "deleted"}`, "debug");
 
-			if (endpoint != null && payload != null) {
-				try {
-					const result = await POST(endpoint, payload);
-					wasAcked = (result != null) && (result.indexOf("Ok") > -1);
-				} catch (e) {
-					_.log(`Error handling state change ${id} => ${state.val}: ${e.message}`, "error");
+			if (id.startsWith(adapter.namespace)) {
+				// this is our own object.
+
+				if (obj) {
+					// object modified or added
+
+					// remember it
+					objects.set(id, obj);
+				} else {
+					// object deleted
+					if (objects.has(id)) objects.delete(id);
 				}
 
-				// ACK the state if necessary
-				if (wasAcked) {
-					await adapter.$setState(id, state, true);
-				}
 			}
-		} else if (!state) {
-			// TODO: find out what to do when states are deleted
-		}
 
-	},
+		},
 
-	unload: (callback) => {
-		// is called when adapter shuts down - callback has to be called under any circumstances!
-		try {
-			// stop pinging
-			if (pingTimer != null) clearTimeout(pingTimer);
+		stateChange: async (id, state) => {
+			if (state) {
+				_.log(`{{blue}} state with id ${id} updated: ack=${state.ack}; val=${state.val}`, "debug");
+			} else {
+				_.log(`{{blue}} state with id ${id} deleted`, "debug");
+			}
 
-			// close the connection
-			adapter.setState("info.connection", false, true);
+			if (state && !state.ack && id.startsWith(adapter.namespace)) {
+				// our own state was changed from within ioBroker, react to it
 
-			callback();
-		} catch (e) {
-			callback();
-		}
-	},
-}) as ExtendedAdapter;
+				const stateObj = objects.get(id);
+				let wasAcked: boolean = false;
+				let endpoint: string;
+				let payload: any;
+				if (/\.muted$/.test(id)) {
+					// mute/unmute the TV
+					endpoint = "audio/volume";
+					payload = { muted: state.val };
+				} else if (/\.volume$/.test(id)) {
+					// change the volume
+					endpoint = "audio/volume";
+					payload = { current: state.val };
+				} else if (/\.pressKey$/.test(id)) {
+					// send a key press to the TV
+					endpoint = "input/key";
+					payload = { key: state.val };
+				}
+
+				if (endpoint != null && payload != null) {
+					try {
+						const result = await POST(endpoint, payload);
+						wasAcked = (result != null) && (result.indexOf("Ok") > -1);
+					} catch (e) {
+						_.log(`Error handling state change ${id} => ${state.val}: ${e.message}`, "error");
+					}
+
+					// ACK the state if necessary
+					if (wasAcked) {
+						await adapter.$setState(id, state, true);
+					}
+				}
+			} else if (!state) {
+				// TODO: find out what to do when states are deleted
+			}
+
+		},
+
+		unload: (callback) => {
+			// is called when adapter shuts down - callback has to be called under any circumstances!
+			try {
+				// stop pinging
+				if (pingTimer != null) clearTimeout(pingTimer);
+
+				// close the connection
+				adapter.setState("info.connection", false, true);
+
+				callback();
+			} catch (e) {
+				callback();
+			}
+		},
+	}) as ExtendedAdapter;
+}
 
 async function GET(path: string): Promise<any> {
 	return request(`${requestPrefix}${path}`);
@@ -180,6 +193,7 @@ async function requestAudio() {
 
 		// update muted state
 		await extendObject("muted", { // alive state
+			_id: `${adapter.namespace}.muted`,
 			type: "state",
 			common: {
 				name: "muted",
@@ -195,6 +209,7 @@ async function requestAudio() {
 
 		// update volume state
 		await extendObject("volume", { // alive state
+			_id: `${adapter.namespace}.volume`,
 			type: "state",
 			common: {
 				name: "volume",
@@ -266,3 +281,9 @@ process.on("uncaughtException", (err: Error) => {
 	if (err.stack != null) adapter.log.error("> stack: " + err.stack);
 	process.exit(1);
 });
+
+if (module.parent) {
+	module.exports = startAdapter;
+} else {
+	startAdapter();
+}

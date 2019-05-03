@@ -1,3 +1,4 @@
+/// <reference types="iobroker" />
 import { DictionaryLike } from "./object-polyfill";
 export interface ExtendedAdapter extends ioBroker.Adapter {
     __isExtended: boolean;

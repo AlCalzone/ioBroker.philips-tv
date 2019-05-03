@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -14,8 +25,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
         while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
                 case 0: case 1: t = op; break;
                 case 4: _.label++; return { value: op[1], done: false };
@@ -34,153 +45,152 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var request = require("request-promise-native");
 // Eigene Module laden
 var fix_objects_1 = require("./lib/fix-objects");
 var global_1 = require("./lib/global");
-// import { wait } from "./lib/promises";
 // Adapter-Utils laden
-var utils_1 = require("./lib/utils");
+var utils = require("@iobroker/adapter-core");
 // Objekte verwalten
 var objects = new Map();
 var hostname;
 var requestPrefix;
-// Adapter-Objekt erstellen
-var adapter = utils_1.default.adapter({
-    name: "philips-tv",
-    // Wird aufgerufen, wenn Adapter initialisiert wird
-    ready: function () { return __awaiter(_this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    // Adapter-Instanz global machen
-                    adapter = global_1.Global.extend(adapter);
-                    global_1.Global.adapter = adapter;
-                    // Fix our adapter objects to repair incompatibilities between versions
-                    return [4 /*yield*/, fix_objects_1.ensureInstanceObjects()];
-                case 1:
-                    // Fix our adapter objects to repair incompatibilities between versions
-                    _a.sent();
-                    // we're not connected yet!
-                    return [4 /*yield*/, adapter.setState("info.connection", false, true)];
-                case 2:
-                    // we're not connected yet!
-                    _a.sent();
-                    // Sicherstellen, dass die Optionen vollständig ausgefüllt sind.
-                    if (adapter.config && adapter.config.host != null && adapter.config.host !== "") {
-                        // alles gut
-                    }
-                    else {
-                        adapter.log.error("Please set the connection params in the adapter options before starting the adapter!");
+var adapter;
+function startAdapter(options) {
+    var _this = this;
+    if (options === void 0) { options = {}; }
+    return adapter = utils.adapter(__assign({}, options, { 
+        // Custom options
+        name: "philips-tv", 
+        // Wird aufgerufen, wenn Adapter initialisiert wird
+        ready: function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        // Adapter-Instanz global machen
+                        adapter = global_1.Global.extend(adapter);
+                        global_1.Global.adapter = adapter;
+                        // Fix our adapter objects to repair incompatibilities between versions
+                        return [4 /*yield*/, fix_objects_1.ensureInstanceObjects()];
+                    case 1:
+                        // Fix our adapter objects to repair incompatibilities between versions
+                        _a.sent();
+                        // we're not connected yet!
+                        return [4 /*yield*/, adapter.setState("info.connection", false, true)];
+                    case 2:
+                        // we're not connected yet!
+                        _a.sent();
+                        // Sicherstellen, dass die Optionen vollständig ausgefüllt sind.
+                        if (adapter.config && adapter.config.host != null && adapter.config.host !== "") {
+                            // alles gut
+                        }
+                        else {
+                            adapter.log.error("Please set the connection params in the adapter options before starting the adapter!");
+                            return [2 /*return*/];
+                        }
+                        hostname = adapter.config.host.toLowerCase();
+                        requestPrefix = "http://" + hostname + ":1925/1/";
+                        // watch own states
+                        adapter.subscribeStates(adapter.namespace + ".*");
+                        adapter.subscribeObjects(adapter.namespace + ".*");
+                        setImmediate(pingThread);
                         return [2 /*return*/];
-                    }
-                    hostname = adapter.config.host.toLowerCase();
-                    requestPrefix = "http://" + hostname + ":1925/1/";
-                    // watch own states
-                    adapter.subscribeStates(adapter.namespace + ".*");
-                    adapter.subscribeObjects(adapter.namespace + ".*");
-                    setImmediate(pingThread);
-                    return [2 /*return*/];
+                }
+            });
+        }); }, 
+        // Handle sendTo-Messages
+        message: function (obj) {
+            // TODO
+        }, objectChange: function (id, obj) {
+            global_1.Global.log("{{blue}} object with id " + id + " " + (obj ? "updated" : "deleted"), "debug");
+            if (id.startsWith(adapter.namespace)) {
+                // this is our own object.
+                if (obj) {
+                    // object modified or added
+                    // remember it
+                    objects.set(id, obj);
+                }
+                else {
+                    // object deleted
+                    if (objects.has(id))
+                        objects.delete(id);
+                }
             }
-        });
-    }); },
-    // Handle sendTo-Messages
-    message: function (obj) {
-        // TODO
-    },
-    objectChange: function (id, obj) {
-        global_1.Global.log("{{blue}} object with id " + id + " " + (obj ? "updated" : "deleted"), "debug");
-        if (id.startsWith(adapter.namespace)) {
-            // this is our own object.
-            if (obj) {
-                // object modified or added
-                // remember it
-                objects.set(id, obj);
+        }, stateChange: function (id, state) { return __awaiter(_this, void 0, void 0, function () {
+            var stateObj, wasAcked, endpoint, payload, result, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (state) {
+                            global_1.Global.log("{{blue}} state with id " + id + " updated: ack=" + state.ack + "; val=" + state.val, "debug");
+                        }
+                        else {
+                            global_1.Global.log("{{blue}} state with id " + id + " deleted", "debug");
+                        }
+                        if (!(state && !state.ack && id.startsWith(adapter.namespace))) return [3 /*break*/, 7];
+                        stateObj = objects.get(id);
+                        wasAcked = false;
+                        endpoint = void 0;
+                        payload = void 0;
+                        if (/\.muted$/.test(id)) {
+                            // mute/unmute the TV
+                            endpoint = "audio/volume";
+                            payload = { muted: state.val };
+                        }
+                        else if (/\.volume$/.test(id)) {
+                            // change the volume
+                            endpoint = "audio/volume";
+                            payload = { current: state.val };
+                        }
+                        else if (/\.pressKey$/.test(id)) {
+                            // send a key press to the TV
+                            endpoint = "input/key";
+                            payload = { key: state.val };
+                        }
+                        if (!(endpoint != null && payload != null)) return [3 /*break*/, 6];
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, POST(endpoint, payload)];
+                    case 2:
+                        result = _a.sent();
+                        wasAcked = (result != null) && (result.indexOf("Ok") > -1);
+                        return [3 /*break*/, 4];
+                    case 3:
+                        e_1 = _a.sent();
+                        global_1.Global.log("Error handling state change " + id + " => " + state.val + ": " + e_1.message, "error");
+                        return [3 /*break*/, 4];
+                    case 4:
+                        if (!wasAcked) return [3 /*break*/, 6];
+                        return [4 /*yield*/, adapter.$setState(id, state, true)];
+                    case 5:
+                        _a.sent();
+                        _a.label = 6;
+                    case 6: return [3 /*break*/, 8];
+                    case 7:
+                        if (!state) {
+                            // TODO: find out what to do when states are deleted
+                        }
+                        _a.label = 8;
+                    case 8: return [2 /*return*/];
+                }
+            });
+        }); }, unload: function (callback) {
+            // is called when adapter shuts down - callback has to be called under any circumstances!
+            try {
+                // stop pinging
+                if (pingTimer != null)
+                    clearTimeout(pingTimer);
+                // close the connection
+                adapter.setState("info.connection", false, true);
+                callback();
             }
-            else {
-                // object deleted
-                if (objects.has(id))
-                    objects.delete(id);
+            catch (e) {
+                callback();
             }
-        }
-    },
-    stateChange: function (id, state) { return __awaiter(_this, void 0, void 0, function () {
-        var stateObj, wasAcked, endpoint, payload, result, e_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (state) {
-                        global_1.Global.log("{{blue}} state with id " + id + " updated: ack=" + state.ack + "; val=" + state.val, "debug");
-                    }
-                    else {
-                        global_1.Global.log("{{blue}} state with id " + id + " deleted", "debug");
-                    }
-                    if (!(state && !state.ack && id.startsWith(adapter.namespace))) return [3 /*break*/, 7];
-                    stateObj = objects.get(id);
-                    wasAcked = false;
-                    endpoint = void 0;
-                    payload = void 0;
-                    if (/\.muted$/.test(id)) {
-                        // mute/unmute the TV
-                        endpoint = "audio/volume";
-                        payload = { muted: state.val };
-                    }
-                    else if (/\.volume$/.test(id)) {
-                        // change the volume
-                        endpoint = "audio/volume";
-                        payload = { current: state.val };
-                    }
-                    else if (/\.pressKey$/.test(id)) {
-                        // send a key press to the TV
-                        endpoint = "input/key";
-                        payload = { key: state.val };
-                    }
-                    if (!(endpoint != null && payload != null)) return [3 /*break*/, 6];
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, POST(endpoint, payload)];
-                case 2:
-                    result = _a.sent();
-                    wasAcked = (result != null) && (result.indexOf("Ok") > -1);
-                    return [3 /*break*/, 4];
-                case 3:
-                    e_1 = _a.sent();
-                    global_1.Global.log("Error handling state change " + id + " => " + state.val + ": " + e_1.message, "error");
-                    return [3 /*break*/, 4];
-                case 4:
-                    if (!wasAcked) return [3 /*break*/, 6];
-                    return [4 /*yield*/, adapter.$setState(id, state, true)];
-                case 5:
-                    _a.sent();
-                    _a.label = 6;
-                case 6: return [3 /*break*/, 8];
-                case 7:
-                    if (!state) {
-                        // TODO: find out what to do when states are deleted
-                    }
-                    _a.label = 8;
-                case 8: return [2 /*return*/];
-            }
-        });
-    }); },
-    unload: function (callback) {
-        // is called when adapter shuts down - callback has to be called under any circumstances!
-        try {
-            // stop pinging
-            if (pingTimer != null)
-                clearTimeout(pingTimer);
-            // close the connection
-            adapter.setState("info.connection", false, true);
-            callback();
-        }
-        catch (e) {
-            callback();
-        }
-    },
-});
+        } }));
+}
 function GET(path) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -258,6 +268,7 @@ function requestAudio() {
                     result = _b.apply(_a, [_c.sent()]);
                     // update muted state
                     return [4 /*yield*/, extendObject("muted", {
+                            _id: adapter.namespace + ".muted",
                             type: "state",
                             common: {
                                 name: "muted",
@@ -277,6 +288,7 @@ function requestAudio() {
                     _c.sent();
                     // update volume state
                     return [4 /*yield*/, extendObject("volume", {
+                            _id: adapter.namespace + ".volume",
                             type: "state",
                             common: {
                                 name: "volume",
@@ -388,3 +400,9 @@ process.on("uncaughtException", function (err) {
         adapter.log.error("> stack: " + err.stack);
     process.exit(1);
 });
+if (module.parent) {
+    module.exports = startAdapter;
+}
+else {
+    startAdapter();
+}
