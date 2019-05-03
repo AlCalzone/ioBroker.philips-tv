@@ -13,7 +13,7 @@ export async function ensureInstanceObjects(): Promise<void> {
 	if (ioPack.instanceObjects == null || ioPack.instanceObjects.length === 0) return;
 
 	// wait for all instance objects to be created
-	const setObjects = ioPack.instanceObjects.map(
+	const setObjects = (ioPack.instanceObjects as ioBroker.Object[]).map(
 		obj => _.adapter.$setObjectNotExists(obj._id, obj),
 	);
 	await Promise.all(setObjects);

@@ -1,6 +1,5 @@
-import * as request from "request-promise-native";
-
 // Eigene Module laden
+import { API, APIVersion, Credentials } from "./api/index";
 import { ensureInstanceObjects } from "./lib/fix-objects";
 import { ExtendedAdapter, Global as _ } from "./lib/global";
 
@@ -11,6 +10,8 @@ declare global {
 	namespace ioBroker {
 		interface AdapterConfig {
 			host: string;
+			username?: string;
+			password?: string;
 		}
 	}
 }
@@ -18,8 +19,9 @@ declare global {
 // Objekte verwalten
 const objects = new Map<string, ioBroker.Object>();
 
+let api: API;
 let hostname: string;
-let requestPrefix: string;
+let credentials: Credentials;
 
 let adapter: ExtendedAdapter;
 
@@ -44,15 +46,20 @@ function startAdapter(options: Partial<ioBroker.AdapterOptions> = {}) {
 			// we're not connected yet!
 			await adapter.setState("info.connection", false, true);
 
+			
 			// Sicherstellen, dass die Optionen vollständig ausgefüllt sind.
 			if (adapter.config && adapter.config.host != null && adapter.config.host !== "") {
 				// alles gut
+				hostname = adapter.config.host;
 			} else {
 				adapter.log.error("Please set the connection params in the adapter options before starting the adapter!");
 				return;
 			}
-			hostname = adapter.config.host.toLowerCase();
-			requestPrefix = `http://${hostname}:1925/1/`;
+
+			credentials = {
+				username: adapter.config.username || "",
+				password: adapter.config.password || "",
+			};
 
 			// watch own states
 			adapter.subscribeStates(`${adapter.namespace}.*`);
@@ -63,8 +70,48 @@ function startAdapter(options: Partial<ioBroker.AdapterOptions> = {}) {
 		},
 
 		// Handle sendTo-Messages
-		message: (obj: ioBroker.Message) => {
-			// TODO
+		message: async (obj: ioBroker.Message) => {
+			interface Response {
+				error?: string;
+				result?: any;
+			}
+			type ResponseFactory = (...args: any[]) => Response;
+			// responds to the adapter that sent the original message
+			function respond(response: Response) {
+				if (obj.callback) _.adapter.sendTo(obj.from, obj.command, response, obj.callback);
+			}
+			// some predefined responses so we only have to define them once
+			const responses = {
+				ACK: { error: null },
+				OK: { error: null, result: "ok" },
+				ERROR_UNKNOWN_COMMAND: { error: "Unknown command!" },
+				MISSING_PARAMETER: (paramName) => {
+					return { error: 'missing parameter "' + paramName + '"!' };
+				},
+				COMMAND_RUNNING: { error: "command running" },
+				RESULT: (result) => ({ error: null, result }),
+				ERROR: (error: string) => ({ error }),
+			};
+			// make required parameters easier
+			function requireParams(...params: string[]) {
+				if (!params.length) return true;
+				for (const param of params) {
+					if (!(obj.message && obj.message.hasOwnProperty(param))) {
+						respond(responses.MISSING_PARAMETER(param));
+						return false;
+					}
+				}
+				return true;
+			}
+
+			// handle the message
+			if (obj) {
+				switch (obj.command) {
+					default:
+						respond(responses.ERROR_UNKNOWN_COMMAND);
+						return;
+				}
+			}
 		},
 
 		objectChange: (id, obj) => {
@@ -84,7 +131,6 @@ function startAdapter(options: Partial<ioBroker.AdapterOptions> = {}) {
 				}
 
 			}
-
 		},
 
 		stateChange: async (id, state) => {
@@ -97,6 +143,11 @@ function startAdapter(options: Partial<ioBroker.AdapterOptions> = {}) {
 			if (state && !state.ack && id.startsWith(adapter.namespace)) {
 				// our own state was changed from within ioBroker, react to it
 
+				if (!connectionAlive) {
+					adapter.log.warn(`Not connected to the TV - can't handle state change ${id}`);
+					return;
+				}
+	
 				const stateObj = objects.get(id);
 				let wasAcked: boolean = false;
 				let endpoint: string;
@@ -117,11 +168,11 @@ function startAdapter(options: Partial<ioBroker.AdapterOptions> = {}) {
 
 				if (endpoint != null && payload != null) {
 					try {
-						const result = await POST(endpoint, payload);
+						const result = await api.postJSON(endpoint, payload);
 						wasAcked = (result != null) && (result.indexOf("Ok") > -1);
 					} catch (e) {
 						_.log(`Error handling state change ${id} => ${state.val}: ${e.message}`, "error");
-					}
+						}
 
 					// ACK the state if necessary
 					if (wasAcked) {
@@ -151,32 +202,6 @@ function startAdapter(options: Partial<ioBroker.AdapterOptions> = {}) {
 	}) as ExtendedAdapter;
 }
 
-async function GET(path: string): Promise<any> {
-	return request(`${requestPrefix}${path}`);
-}
-
-async function POST(path: string, jsonPayload: any): Promise<string> {
-	return request({
-		uri: `${requestPrefix}${path}`,
-		method: "POST",
-		json: jsonPayload,
-	});
-}
-
-/**
- * Checks if the TV is reachable
- */
-async function checkConnection(): Promise<boolean> {
-	try {
-		// audio/volume has only a little data,
-		// so we use that path to check the connection
-		await GET("audio/volume");
-		return true;
-	} catch (e) {
-		return false;
-	}
-}
-
 /**
  * Requests information from the TV. Has to be called periodically.
  */
@@ -189,7 +214,7 @@ async function poll(): Promise<void> {
 
 async function requestAudio() {
 	try {
-		const result = JSON.parse(await GET("audio/volume"));
+		const result = JSON.parse(await api.get("audio/volume") as string);
 
 		// update muted state
 		await extendObject("muted", { // alive state
@@ -203,7 +228,7 @@ async function requestAudio() {
 				role: "value.muted",
 				desc: "Indicates if the TV is muted",
 			},
-			native: { },
+			native: {},
 		});
 		await adapter.$setStateChanged(`${adapter.namespace}.muted`, result.muted, true);
 
@@ -220,7 +245,7 @@ async function requestAudio() {
 				max: result.max,
 				role: "value.volume",
 			},
-			native: { },
+			native: {},
 		});
 		await adapter.$setStateChanged(`${adapter.namespace}.volume`, result.current, true);
 	} catch (e) { /* it's ok */ }
@@ -228,7 +253,7 @@ async function requestAudio() {
 
 async function extendObject(objId: string, obj: ioBroker.Object) {
 	const oldObj = await adapter.$getObject(objId);
-	const newObj = Object.assign(Object.assign({}, oldObj), obj);
+	const newObj = Object.assign({}, oldObj, obj);
 	if (JSON.stringify(newObj) !== JSON.stringify(oldObj)) {
 		await adapter.$setObject(objId, newObj);
 	}
@@ -240,23 +265,76 @@ async function extendObject(objId: string, obj: ioBroker.Object) {
 let pingTimer: NodeJS.Timer;
 let connectionAlive: boolean = false;
 
+async function updateTVInfo(info: {
+	apiVersion: APIVersion | "not found",
+	requiresPairing?: boolean,
+	paired?: boolean,
+}) {
+	await adapter.$setState("info.apiVersion", info.apiVersion, true);
+	if (info.requiresPairing != null) await adapter.$setState("info.requiresPairing", info.requiresPairing, true);
+	if (info.paired != null) await adapter.$setState("info.paired", info.paired, true);
+}
+
 async function pingThread() {
+
 	const oldValue = connectionAlive;
-	connectionAlive = await checkConnection();
+
+	// if this is the first time connecting to the TV, determine the API version
+	if (api == null) {
+		try {
+			adapter.log.debug(`initializing connection to ${hostname}`);
+			api = await API.create(hostname);
+			if (api == null) {
+				// no compatible API found
+				adapter.log.warn(`The TV at ${hostname} has an API version incompatible with this adapter!`);
+				await updateTVInfo({ apiVersion: "unknown" });
+				connectionAlive = false;
+				// don't retry, we don't support this TV
+				return;
+			} else {
+				// check if we need credentials and also have them
+				const isPaired = (credentials.username !== "" || credentials.password !== "");
+				await updateTVInfo({
+					apiVersion: api.version,
+					requiresPairing: api.requiresPairing,
+					paired: isPaired,
+				});
+				if (api.requiresPairing) {
+					if (isPaired) {
+						// we have credentials, so use them
+						api.provideCredentials(credentials);
+					} else {
+						adapter.log.warn(`The TV at ${hostname} needs to be paired before you can use the adapter. Go to the adapter config to continue!`);
+						connectionAlive = false;
+						// don't retry, we need to wait for the pairing
+						return;
+					}
+				}
+				connectionAlive = true;
+			}
+		} catch (e) {
+			await updateTVInfo({ apiVersion: "not found" });
+			adapter.log.debug(`Could not initialize connection. Reason: ${e.message}`);
+			connectionAlive = false;
+		}
+	} else {
+		connectionAlive = await api.checkConnection();
+	}
+
 	await adapter.$setStateChanged("info.connection", connectionAlive, true);
 
 	// see if the connection state has changed
 	if (connectionAlive) {
 		if (!oldValue) {
 			// connection is now alive again
-			_.log(`The TV with host ${hostname} is now reachable.`, "info");
+			_.log(`The TV at ${hostname} is now reachable.`, "info");
 		}
 		// update information
 		await poll();
 	} else {
 		if (oldValue) {
 			// connection is now dead
-			_.log(`The TV with host ${hostname} is not reachable anymore.`, "info");
+			_.log(`The TV at ${hostname} is not reachable anymore.`, "info");
 		}
 	}
 

@@ -12,17 +12,22 @@
         // "noUnusedLocals": true,
         // "noUnusedParameters": true,
         
+        "jsx": "react",
+        
         "sourceMap": false,
         "inlineSourceMap": false,
         //"sourceRoot": "src/",
         "target": "es5",
-        "lib": [ "es6" ]
-        //"watch": true
+        "lib": [
+            "es6",
+            "dom" // <= necessary to get rid of @types/jquery errors
+        ]
     },
     "include": [
         "src/**/*.ts"
     ],
     "exclude": [
+        "node_modules/**/*.d.ts",
         "admin/**/*.ts",
         "src/**/*.test.ts"
     ]

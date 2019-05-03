@@ -1,0 +1,27 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "declaration": false,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noEmitOnError": true,
+        "noImplicitAny": false,
+        "outDir": "admin/build/",
+        "removeComments": false,
+
+        "jsx": "react",
+
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        
+        "sourceMap": true,
+        "sourceRoot": "admin/src/",
+        "target": "es2015",
+        "lib": [
+            "dom", "es2015"
+        ]
+    },
+    "include": [
+        "admin/**/*.ts*"
+    ]
+}

@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "philips-tv",
-        "version": "0.2.0",
+        "version": "0.3.0-alpha7",
         "news": {
+            "0.3.0-alpha4": {
+                "en": "Support for TVs with API v5",
+                "de": "Fernseher mit API v5 unterstützt"
+            },
             "0.2.0": {
                 "en": "Support sending key presses",
                 "de": "Senden von Tastendrücken unterstützt"
@@ -39,7 +43,9 @@
         "messagebox": true
     },
     "native": {
-        "host": ""
+        "host": "",
+        "username": "",
+        "password": ""
     },
     "objects": [],
     "instanceObjects": [
@@ -57,6 +63,45 @@
             "common": {
                 "role": "indicator.connected",
                 "name": "Whether the adapter is connected to the TV",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.apiVersion",
+            "type": "state",
+            "common": {
+                "role": "indicator.apiVersion",
+                "name": "The API version of the TV",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.requiresPairing",
+            "type": "state",
+            "common": {
+                "role": "indicator.requiresPairing",
+                "name": "If the TV needs to be paired",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.paired",
+            "type": "state",
+            "common": {
+                "role": "indicator.paired",
+                "name": "If the TV is currently paired",
                 "type": "boolean",
                 "read": true,
                 "write": false,

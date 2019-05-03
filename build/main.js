@@ -46,16 +46,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var request = require("request-promise-native");
 // Eigene Module laden
+var index_1 = require("./api/index");
 var fix_objects_1 = require("./lib/fix-objects");
 var global_1 = require("./lib/global");
 // Adapter-Utils laden
 var utils = require("@iobroker/adapter-core");
 // Objekte verwalten
 var objects = new Map();
+var api;
 var hostname;
-var requestPrefix;
+var credentials;
 var adapter;
 function startAdapter(options) {
     var _this = this;
@@ -84,13 +85,16 @@ function startAdapter(options) {
                         // Sicherstellen, dass die Optionen vollständig ausgefüllt sind.
                         if (adapter.config && adapter.config.host != null && adapter.config.host !== "") {
                             // alles gut
+                            hostname = adapter.config.host;
                         }
                         else {
                             adapter.log.error("Please set the connection params in the adapter options before starting the adapter!");
                             return [2 /*return*/];
                         }
-                        hostname = adapter.config.host.toLowerCase();
-                        requestPrefix = "http://" + hostname + ":1925/1/";
+                        credentials = {
+                            username: adapter.config.username || "",
+                            password: adapter.config.password || "",
+                        };
                         // watch own states
                         adapter.subscribeStates(adapter.namespace + ".*");
                         adapter.subscribeObjects(adapter.namespace + ".*");
@@ -100,9 +104,53 @@ function startAdapter(options) {
             });
         }); }, 
         // Handle sendTo-Messages
-        message: function (obj) {
-            // TODO
-        }, objectChange: function (id, obj) {
+        message: function (obj) { return __awaiter(_this, void 0, void 0, function () {
+            // responds to the adapter that sent the original message
+            function respond(response) {
+                if (obj.callback)
+                    global_1.Global.adapter.sendTo(obj.from, obj.command, response, obj.callback);
+            }
+            // make required parameters easier
+            function requireParams() {
+                var params = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    params[_i] = arguments[_i];
+                }
+                if (!params.length)
+                    return true;
+                for (var _a = 0, params_1 = params; _a < params_1.length; _a++) {
+                    var param = params_1[_a];
+                    if (!(obj.message && obj.message.hasOwnProperty(param))) {
+                        respond(responses.MISSING_PARAMETER(param));
+                        return false;
+                    }
+                }
+                return true;
+            }
+            var responses;
+            return __generator(this, function (_a) {
+                responses = {
+                    ACK: { error: null },
+                    OK: { error: null, result: "ok" },
+                    ERROR_UNKNOWN_COMMAND: { error: "Unknown command!" },
+                    MISSING_PARAMETER: function (paramName) {
+                        return { error: 'missing parameter "' + paramName + '"!' };
+                    },
+                    COMMAND_RUNNING: { error: "command running" },
+                    RESULT: function (result) { return ({ error: null, result: result }); },
+                    ERROR: function (error) { return ({ error: error }); },
+                };
+                // handle the message
+                if (obj) {
+                    switch (obj.command) {
+                        default:
+                            respond(responses.ERROR_UNKNOWN_COMMAND);
+                            return [2 /*return*/];
+                    }
+                }
+                return [2 /*return*/];
+            });
+        }); }, objectChange: function (id, obj) {
             global_1.Global.log("{{blue}} object with id " + id + " " + (obj ? "updated" : "deleted"), "debug");
             if (id.startsWith(adapter.namespace)) {
                 // this is our own object.
@@ -129,6 +177,11 @@ function startAdapter(options) {
                             global_1.Global.log("{{blue}} state with id " + id + " deleted", "debug");
                         }
                         if (!(state && !state.ack && id.startsWith(adapter.namespace))) return [3 /*break*/, 7];
+                        // our own state was changed from within ioBroker, react to it
+                        if (!connectionAlive) {
+                            adapter.log.warn("Not connected to the TV - can't handle state change " + id);
+                            return [2 /*return*/];
+                        }
                         stateObj = objects.get(id);
                         wasAcked = false;
                         endpoint = void 0;
@@ -152,7 +205,7 @@ function startAdapter(options) {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, POST(endpoint, payload)];
+                        return [4 /*yield*/, api.postJSON(endpoint, payload)];
                     case 2:
                         result = _a.sent();
                         wasAcked = (result != null) && (result.indexOf("Ok") > -1);
@@ -191,50 +244,6 @@ function startAdapter(options) {
             }
         } }));
 }
-function GET(path) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, request("" + requestPrefix + path)];
-        });
-    });
-}
-function POST(path, jsonPayload) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, request({
-                    uri: "" + requestPrefix + path,
-                    method: "POST",
-                    json: jsonPayload,
-                })];
-        });
-    });
-}
-/**
- * Checks if the TV is reachable
- */
-function checkConnection() {
-    return __awaiter(this, void 0, void 0, function () {
-        var e_2;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    // audio/volume has only a little data,
-                    // so we use that path to check the connection
-                    return [4 /*yield*/, GET("audio/volume")];
-                case 1:
-                    // audio/volume has only a little data,
-                    // so we use that path to check the connection
-                    _a.sent();
-                    return [2 /*return*/, true];
-                case 2:
-                    e_2 = _a.sent();
-                    return [2 /*return*/, false];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
 /**
  * Requests information from the TV. Has to be called periodically.
  */
@@ -257,13 +266,13 @@ function poll() {
 }
 function requestAudio() {
     return __awaiter(this, void 0, void 0, function () {
-        var result, _a, _b, e_3;
+        var result, _a, _b, e_2;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
                     _c.trys.push([0, 6, , 7]);
                     _b = (_a = JSON).parse;
-                    return [4 /*yield*/, GET("audio/volume")];
+                    return [4 /*yield*/, api.get("audio/volume")];
                 case 1:
                     result = _b.apply(_a, [_c.sent()]);
                     // update muted state
@@ -309,7 +318,7 @@ function requestAudio() {
                     _c.sent();
                     return [3 /*break*/, 7];
                 case 6:
-                    e_3 = _c.sent();
+                    e_2 = _c.sent();
                     return [3 /*break*/, 7];
                 case 7: return [2 /*return*/];
             }
@@ -324,7 +333,7 @@ function extendObject(objId, obj) {
                 case 0: return [4 /*yield*/, adapter.$getObject(objId)];
                 case 1:
                     oldObj = _a.sent();
-                    newObj = Object.assign(Object.assign({}, oldObj), obj);
+                    newObj = Object.assign({}, oldObj, obj);
                     if (!(JSON.stringify(newObj) !== JSON.stringify(oldObj))) return [3 /*break*/, 3];
                     return [4 /*yield*/, adapter.$setObject(objId, newObj)];
                 case 2:
@@ -339,37 +348,111 @@ function extendObject(objId, obj) {
 // Connection check
 var pingTimer;
 var connectionAlive = false;
+function updateTVInfo(info) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, adapter.$setState("info.apiVersion", info.apiVersion, true)];
+                case 1:
+                    _a.sent();
+                    if (!(info.requiresPairing != null)) return [3 /*break*/, 3];
+                    return [4 /*yield*/, adapter.$setState("info.requiresPairing", info.requiresPairing, true)];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
+                case 3:
+                    if (!(info.paired != null)) return [3 /*break*/, 5];
+                    return [4 /*yield*/, adapter.$setState("info.paired", info.paired, true)];
+                case 4:
+                    _a.sent();
+                    _a.label = 5;
+                case 5: return [2 /*return*/];
+            }
+        });
+    });
+}
 function pingThread() {
     return __awaiter(this, void 0, void 0, function () {
-        var oldValue;
+        var oldValue, isPaired, e_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     oldValue = connectionAlive;
-                    return [4 /*yield*/, checkConnection()];
+                    if (!(api == null)) return [3 /*break*/, 10];
+                    _a.label = 1;
                 case 1:
-                    connectionAlive = _a.sent();
-                    return [4 /*yield*/, adapter.$setStateChanged("info.connection", connectionAlive, true)];
+                    _a.trys.push([1, 7, , 9]);
+                    adapter.log.debug("initializing connection to " + hostname);
+                    return [4 /*yield*/, index_1.API.create(hostname)];
                 case 2:
+                    api = _a.sent();
+                    if (!(api == null)) return [3 /*break*/, 4];
+                    // no compatible API found
+                    adapter.log.warn("The TV at " + hostname + " has an API version incompatible with this adapter!");
+                    return [4 /*yield*/, updateTVInfo({ apiVersion: "unknown" })];
+                case 3:
                     _a.sent();
-                    if (!connectionAlive) return [3 /*break*/, 4];
+                    connectionAlive = false;
+                    // don't retry, we don't support this TV
+                    return [2 /*return*/];
+                case 4:
+                    isPaired = (credentials.username !== "" || credentials.password !== "");
+                    return [4 /*yield*/, updateTVInfo({
+                            apiVersion: api.version,
+                            requiresPairing: api.requiresPairing,
+                            paired: isPaired,
+                        })];
+                case 5:
+                    _a.sent();
+                    if (api.requiresPairing) {
+                        if (isPaired) {
+                            // we have credentials, so use them
+                            api.provideCredentials(credentials);
+                        }
+                        else {
+                            adapter.log.warn("The TV at " + hostname + " needs to be paired before you can use the adapter. Go to the adapter config to continue!");
+                            connectionAlive = false;
+                            // don't retry, we need to wait for the pairing
+                            return [2 /*return*/];
+                        }
+                    }
+                    connectionAlive = true;
+                    _a.label = 6;
+                case 6: return [3 /*break*/, 9];
+                case 7:
+                    e_3 = _a.sent();
+                    return [4 /*yield*/, updateTVInfo({ apiVersion: "not found" })];
+                case 8:
+                    _a.sent();
+                    adapter.log.debug("Could not initialize connection. Reason: " + e_3.message);
+                    connectionAlive = false;
+                    return [3 /*break*/, 9];
+                case 9: return [3 /*break*/, 12];
+                case 10: return [4 /*yield*/, api.checkConnection()];
+                case 11:
+                    connectionAlive = _a.sent();
+                    _a.label = 12;
+                case 12: return [4 /*yield*/, adapter.$setStateChanged("info.connection", connectionAlive, true)];
+                case 13:
+                    _a.sent();
+                    if (!connectionAlive) return [3 /*break*/, 15];
                     if (!oldValue) {
                         // connection is now alive again
-                        global_1.Global.log("The TV with host " + hostname + " is now reachable.", "info");
+                        global_1.Global.log("The TV at " + hostname + " is now reachable.", "info");
                     }
                     // update information
                     return [4 /*yield*/, poll()];
-                case 3:
+                case 14:
                     // update information
                     _a.sent();
-                    return [3 /*break*/, 5];
-                case 4:
+                    return [3 /*break*/, 16];
+                case 15:
                     if (oldValue) {
                         // connection is now dead
-                        global_1.Global.log("The TV with host " + hostname + " is not reachable anymore.", "info");
+                        global_1.Global.log("The TV at " + hostname + " is not reachable anymore.", "info");
                     }
-                    _a.label = 5;
-                case 5:
+                    _a.label = 16;
+                case 16:
                     pingTimer = setTimeout(pingThread, 10000);
                     return [2 /*return*/];
             }
