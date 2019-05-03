@@ -4,6 +4,8 @@ ioBroker.philips-tv
 
 **Tests:** Linux/Mac: [![Build Status](https://travis-ci.org/AlCalzone/ioBroker.philips-tv.svg?branch=master)](https://travis-ci.org/AlCalzone/ioBroker.philips-tv) 
 Windows: [![AppVeyor](https://ci.appveyor.com/api/projects/status/github/AlCalzone/ioBroker.philips-tv?branch=master&svg=true)](https://ci.appveyor.com/project/AlCalzone/ioBroker-philips-tv/)
+![Number of Installations](http://iobroker.live/badges/philips-tv-installed.svg)
+![Number of Installations](http://iobroker.live/badges/philips-tv-stable.svg) 
 
 ================
 
@@ -11,19 +13,19 @@ http://jointspace.sourceforge.net/projectdata/documentation/jasonApi/1/doc/API.h
 
 ## Changelog
 
-#### 0.3.0-alpha
+### 0.3.0-alpha
 * (AlCalzone) Support for TVs with API v5
 
-#### 0.2.0
+### 0.2.0
 * (AlCalzone) Support sending key presses
 
-#### 0.1.0
+### 0.1.0
 * (AlCalzone) Initial release
 
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2017 AlCalzone <d.griesel@gmx.net>
+Copyright (c) 2017-2019 AlCalzone <d.griesel@gmx.net>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

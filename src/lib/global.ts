@@ -151,6 +151,7 @@ export class Global {
 		}
 		ret.$createOwnState = async (id: string, initialValue: any, ack: boolean = true, commonType: ioBroker.CommonType = "mixed") => {
 			await ret.$setObject(id, {
+				_id: id,
 				type: "state",
 				common: {
 					name: id,

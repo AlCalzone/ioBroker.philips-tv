@@ -25,10 +25,13 @@
             "AlCalzone <d.griesel@gmx.net>"
         ],
         "platform": "Javascript/Node.js",
+        "main": "build/main.js",
         "mode": "daemon",
+        "compact": true,
         "icon": "philips-tv.png",
         "enabled": false,
         "extIcon": "https://raw.githubusercontent.com/AlCalzone/ioBroker.philips-tv/master/admin/philips-tv.png",
+        "license": "MIT",
         "keywords": [
             "philips",
             "tv",

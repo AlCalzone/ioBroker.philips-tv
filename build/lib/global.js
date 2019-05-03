@@ -113,6 +113,7 @@ var Global = /** @class */ (function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, ret.$setObject(id, {
+                                _id: id,
                                 type: "state",
                                 common: {
                                     name: id,
