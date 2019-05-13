@@ -50,7 +50,7 @@
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "typescript": "^3.4.5",
-    "webpack": "^3.8.1"
+    "webpack": "^4.31.0"
   },
   "main": "build/main.js",
   "scripts": {
