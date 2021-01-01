@@ -37,7 +37,7 @@
     "@types/node": "^13.1.1",
     "@types/request": "^2.48.5",
     "@types/request-promise-native": "^1.0.10",
-    "@types/sinon": "^9.0.9",
+    "@types/sinon": "^9.0.10",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "mocha": "^7.0.0",
