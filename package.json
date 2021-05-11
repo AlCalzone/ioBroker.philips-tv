@@ -43,7 +43,7 @@
     "mocha": "^7.0.0",
     "node-ssh": "^8.0.0",
     "nyc": "^15.1.0",
-    "semver": "^7.3.4",
+    "semver": "^7.3.5",
     "sinon": "^9.2.4",
     "source-map-support": "^0.5.19",
     "ts-loader": "^8.0.17",
