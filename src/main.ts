@@ -408,7 +408,7 @@ class PhilipsTvAndroid extends utils.Adapter {
             await this.setStateChangedAsync('info.connection', false, true);
         }
 
-        setTimeout(() => {
+        this.pollTimer = setTimeout(() => {
             this.pollAPI();
         }, this.pollingInterval);
     }
