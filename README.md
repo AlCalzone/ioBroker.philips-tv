@@ -1,26 +1,41 @@
-![Logo](admin/philips-tv.png)
-ioBroker.philips-tv
-=================
+![Logo](admin/philips-tv-android.png)
+# ioBroker.philips-tv-android
 
-**Tests:** Linux/Mac: [![Build Status](https://travis-ci.org/AlCalzone/ioBroker.philips-tv.svg?branch=master)](https://travis-ci.org/AlCalzone/ioBroker.philips-tv) 
-Windows: [![AppVeyor](https://ci.appveyor.com/api/projects/status/github/AlCalzone/ioBroker.philips-tv?branch=master&svg=true)](https://ci.appveyor.com/project/AlCalzone/ioBroker-philips-tv/)
+[![NPM version](https://img.shields.io/npm/v/iobroker.philips-tv-android.svg)](https://www.npmjs.com/package/iobroker.philips-tv-android)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.philips-tv-android.svg)](https://www.npmjs.com/package/iobroker.philips-tv-android)
+![Number of Installations](https://iobroker.live/badges/philips-tv-android-installed.svg)
+![Current version in stable repository](https://iobroker.live/badges/philips-tv-android-stable.svg)
 
-================
+[![NPM](https://nodei.co/npm/iobroker.philips-tv-android.png?downloads=true)](https://nodei.co/npm/iobroker.philips-tv-android/)
 
-http://jointspace.sourceforge.net/projectdata/documentation/jasonApi/1/doc/API.html
+**Tests:** ![Test and Release](https://github.com/foxriver76/ioBroker.philips-tv-android/workflows/Test%20and%20Release/badge.svg)
+
+## Philips TV Android adapter for ioBroker
+Adapter to control Philips TVs based on Android
+
+## Disclaimer
+The developers of this module are in no way endorsed by or affiliated with Koninklijke Philips N.V., 
+or any associated subsidiaries, logos or trademarks.
 
 ## Changelog
-![Number of Installations](http://iobroker.live/badges/philips-tv-installed.svg) ![Number of Installations](http://iobroker.live/badges/philips-tv-stable.svg) 
-#### 0.2.0
+<!--
+    Placeholder for the next version (at the beginning of the line):
+    ### **WORK IN PROGRESS**
+-->
+### 0.3.0 (2022-09-12)
+* (foxriver76) adapter rework to support Android and JointSpace V6 API
+* __BREAKING__: Please use the adapter config to configure this instance properly
+
+### 0.2.0
 * (AlCalzone) Support sending key presses
 
-#### 0.1.0
+### 0.1.0
 * (AlCalzone) Initial release
 
 ## License
-The MIT License (MIT)
+MIT License
 
-Copyright (c) 2017-2019 AlCalzone <d.griesel@gmx.net>
+Copyright (c) 2022 Moritz Heusinger <moritz.heusinger@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,13 +44,13 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

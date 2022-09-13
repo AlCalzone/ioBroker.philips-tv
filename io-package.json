@@ -1,128 +1,613 @@
 {
-    "common": {
-        "name": "philips-tv",
-        "version": "0.2.0",
-        "news": {
-            "0.2.0": {
-                "en": "Support sending key presses",
-                "de": "Senden von Tastendrücken unterstützt"
-            },
-            "0.1.0": {
-                "en": "Initial release",
-                "de": "Initiale Version"
-            }
-        },
-        "title": "Philips TV",
-        "desc": {
-            "en": "Controls Philips TVs over the network",
-            "de": "Steuert Philips Fernseher über das Netzwerk"
-        },
-        "authors": [
-            "AlCalzone <d.griesel@gmx.net>"
-        ],
-        "platform": "Javascript/Node.js",
-        "main": "build/main.js",
-        "mode": "daemon",
-        "compact": true,
-        "icon": "philips-tv.png",
-        "enabled": false,
-        "extIcon": "https://raw.githubusercontent.com/AlCalzone/ioBroker.philips-tv/master/admin/philips-tv.png",
-        "license": "MIT",
-        "keywords": [
-            "philips",
-            "tv",
-            "remote"
-        ],
-        "readme": "https://github.com/AlCalzone/ioBroker.philips-tv/blob/master/README.md",
-        "loglevel": "info",
-        "type": "multimedia",
-        "messagebox": true
+  "common": {
+    "name": "philips-tv",
+    "version": "0.3.0",
+    "news": {
+      "0.3.0": {
+        "en": "adapter rework to support Android and JointSpace V6 API",
+        "de": "adapter-Rework zur Unterstützung von Android und JointSpace V6 API",
+        "ru": "переработка адаптера для поддержки Android и JointSpace V6 API",
+        "pt": "retrabalho do adaptador para suportar a API do Android e JointSpace V6",
+        "nl": "adapter Rework om Android en JointSpace V6 API",
+        "fr": "retravail adaptateur pour soutenir Android et l'API JointSpace V6",
+        "it": "adattatore di lavoro per supportare Android e JointSpace V6 API",
+        "es": "adaptador rework para apoyar Android y JointSpace V6 API",
+        "pl": "dostosowywanie do Androida i JointSpace V6",
+        "zh-cn": "b. 适应行动"
+      },
+      "0.2.0": {
+        "en": "Support sending key presses",
+        "de": "Senden von Tastendrücken unterstützt"
+      },
+      "0.1.0": {
+        "en": "Initial release",
+        "de": "Initiale Version"
+      }
     },
-    "native": {
-        "host": ""
+    "title": "Philips TV",
+    "titleLang": {
+      "en": "Philips TV",
+      "de": "Philips-Fernseher",
+      "ru": "Филипс ТВ",
+      "pt": "TV Philips",
+      "nl": "Philips-tv",
+      "fr": "Téléviseur Philips",
+      "it": "TV Philips",
+      "es": "Televisor philips",
+      "pl": "Telewizor Philips",
+      "zh-cn": "飞利浦电视"
     },
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Adapter-Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "Whether the adapter is connected to the TV",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        },
-        {
-            "_id": "pressKey",
-            "type": "state",
-            "common": {
-                "role": "value",
-                "name": "Send a key press to the TV",
-                "type": "string",
-                "read": false,
-                "write": true,
-                "states": {
-                    "Standby": "Standby",
-                    "Back": "Back",
-                    "Find": "Find",
-                    "RedColour": "RedColour",
-                    "GreenColour": "GreenColour",
-                    "YellowColour": "YellowColour",
-                    "BlueColour": "BlueColour",
-                    "Home": "Home",
-                    "VolumeUp": "VolumeUp",
-                    "VolumeDown": "VolumeDown",
-                    "Mute": "Mute",
-                    "Options": "Options",
-                    "Dot": "Dot",
-                    "Digit0": "Digit0",
-                    "Digit1": "Digit1",
-                    "Digit2": "Digit2",
-                    "Digit3": "Digit3",
-                    "Digit4": "Digit4",
-                    "Digit5": "Digit5",
-                    "Digit6": "Digit6",
-                    "Digit7": "Digit7",
-                    "Digit8": "Digit8",
-                    "Digit9": "Digit9",
-                    "Info": "Info",
-                    "CursorUp": "CursorUp",
-                    "CursorDown": "CursorDown",
-                    "CursorLeft": "CursorLeft",
-                    "CursorRight": "CursorRight",
-                    "Confirm": "Confirm",
-                    "Next": "Next",
-                    "Previous": "Previous",
-                    "Adjust": "Adjust",
-                    "WatchTV": "WatchTV",
-                    "Viewmode": "Viewmode",
-                    "Teletext": "Teletext",
-                    "Subtitle": "Subtitle",
-                    "ChannelStepUp": "ChannelStepUp",
-                    "ChannelStepDown": "ChannelStepDown",
-                    "Source": "Source",
-                    "AmbilightOnOff": "AmbilightOnOff",
-                    "PlayPause": "PlayPause",
-                    "Pause": "Pause",
-                    "FastForward": "FastForward",
-                    "Stop": "Stop",
-                    "Rewind": "Rewind",
-                    "Record": "Record",
-                    "Online": "Online"
-                }
-            }
-        }
+    "desc": {
+      "en": "Adapter to control Philips TVs",
+      "de": "Adapter zur Steuerung von Philips TVs",
+      "ru": "Адаптер для управления телевизорами Philips",
+      "pt": "Adaptador para controlar Philips TVs",
+      "nl": "Adapter om Philips TV te controleren",
+      "fr": "Adaptateur pour contrôler Philips TV",
+      "it": "Adattatore per il controllo TV Philips",
+      "es": "Adaptador para controlar Philips TVs",
+      "pl": "Oficjalna strona Philips TV",
+      "zh-cn": "控制菲利普电视的道歉"
+    },
+    "authors": [
+      "AlCalzone <d.griesel@gmx.net>",
+      "Moritz Heusinger <moritz.heusinger@gmail.com>"
+    ],
+    "keywords": [
+      "tv",
+      "philips",
+      "android"
+    ],
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "main": "build/main.js",
+    "icon": "philips-tv-android.png",
+    "enabled": true,
+    "messagebox": true,
+    "extIcon": "https://raw.githubusercontent.com/foxriver76/ioBroker.philips-tv-android/main/admin/philips-tv-android.png",
+    "readme": "https://github.com/foxriver76/ioBroker.philips-tv-android/blob/main/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "multimedia",
+    "compact": true,
+    "connectionType": "local",
+    "dataSource": "poll",
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=4.0.0"
+      }
     ]
+  },
+  "native": {
+    "ip": "",
+    "broadcastIp": "255.255.255.255",
+    "mac": "",
+    "apiVersion": 6,
+    "apiType": "Android",
+    "pollingInterval": 5000
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "settings",
+      "type": "channel",
+      "common": {
+        "name": "Settings and device commands"
+      },
+      "native": {}
+    },
+    {
+      "_id": "settings.power",
+      "type": "state",
+      "common": {
+        "role": "switch",
+        "name": "Power state of the TV",
+        "type": "boolean",
+        "read": true,
+        "write": true,
+        "def": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "settings.volume",
+      "type": "state",
+      "common": {
+        "role": "level.volume",
+        "name": "Volume of the TV",
+        "type": "number",
+        "read": true,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "settings.muted",
+      "type": "state",
+      "common": {
+        "role": "switch",
+        "name": "If the TV is muted",
+        "type": "boolean",
+        "read": true,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys",
+      "type": "channel",
+      "common": {
+        "name": "Send key press"
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.rewind",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Rewind",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.fastForward",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Fast forward",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.next",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Next",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.previous",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Previous",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.cursorUp",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Cursor up",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.cursorLeft",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Cursor left",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.cursorRight",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Cursor right",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.cursorDown",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Cursor down",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.confirm",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Confirm",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.back",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Back",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.exit",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Exit",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.PlayPause",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Play/Pause",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.home",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Home",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.volumeUp",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Volume up",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.volumeDown",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Volume down",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.philipsMenu",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Philips Menu",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.source",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Source",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.tvGuide",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "TV Guide",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.record",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Record",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.redColour",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Red Colour",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.greenColour",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Green Colour",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.yellowColour",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Yellow Colour",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.blueColour",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Blue Colour",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.teletext",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Teletext",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.options",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Options",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.mute",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Mute",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.digit0",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Digit 0",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.digit1",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Digit 1",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.digit2",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Digit 2",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.digit3",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Digit 3",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.digit4",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Digit 4",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.digit5",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Digit 5",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.digit6",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Digit 6",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.digit7",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Digit 7",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.digit8",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Digit 8",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.digit9",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Digit 9",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    },
+    {
+      "_id": "keys.ambilightOnOff",
+      "type": "state",
+      "common": {
+        "role": "button",
+        "name": "Ambilight On/Off",
+        "type": "boolean",
+        "read": false,
+        "write": true
+      },
+      "native": {}
+    }
+  ]
 }

@@ -1,0 +1,278 @@
+{
+  "type": "panel",
+  "i18n": {
+    "apiVersion": {
+      "en": "API version",
+      "de": "API-Version",
+      "ru": "Версия API",
+      "pt": "Versão API",
+      "nl": "API",
+      "fr": "Version API",
+      "it": "Versione API",
+      "es": "Versión API",
+      "pl": "Wersja API",
+      "zh-cn": "API版本"
+    },
+    "ip": {
+      "en": "IP address",
+      "de": "IP-Adresse",
+      "ru": "IP адрес",
+      "pt": "Endereço IP",
+      "nl": "IP adres",
+      "fr": "Adresse IP",
+      "it": "Indirizzo IP",
+      "es": "Dirección IP",
+      "pl": "Adres IP",
+      "zh-cn": "IP地址"
+    },
+    "pairingButton": {
+      "en": "Start pairing process",
+      "de": "Pairing starten",
+      "ru": "Начните процесс парения",
+      "pt": "Iniciar processo de emparelhamento",
+      "nl": "Begin met paren",
+      "fr": "Début du processus d'appariement",
+      "it": "Iniziare il processo di accoppiamento",
+      "es": "Comience el proceso de emparejamiento",
+      "pl": "Rozpoczęcie procesu parowania",
+      "zh-cn": "A. 启动的适应进程"
+    },
+    "pinCode": {
+      "en": "PIN code",
+      "de": "PIN-Code",
+      "ru": "PIN код",
+      "pt": "Código PIN",
+      "nl": "PIN code",
+      "fr": "Code PIN",
+      "it": "Codice PIN",
+      "es": "Código PIN",
+      "pl": "Kod PIN",
+      "zh-cn": "PIN守则"
+    },
+    "submitPin": {
+      "en": "Submit PIN",
+      "de": "PIN bestätigen",
+      "ru": "Отправить PIN",
+      "pt": "Submeter-me",
+      "nl": "Vertaling:",
+      "fr": "Soumettre le code PIN",
+      "it": "Inviare PIN",
+      "es": "Submit PIN",
+      "pl": "PIN",
+      "zh-cn": "分遣队"
+    },
+    "mac": {
+      "en": "MAC address",
+      "de": "MAC-Adresse",
+      "ru": "MAC адрес",
+      "pt": "Endereço MAC",
+      "nl": "MAC adres",
+      "fr": "Adresse MAC",
+      "it": "Indirizzo MAC",
+      "es": "Dirección del MAC",
+      "pl": "Adres MAC",
+      "zh-cn": "MAC地址"
+    },
+    "broadcastIp": {
+      "en": "Broadcast IP",
+      "de": "Broadcast IP",
+      "ru": "Трансляция IP",
+      "pt": "IP de transmissão",
+      "nl": "Broadcast IP",
+      "fr": "Broadcast IP",
+      "it": "Trasmissione IP",
+      "es": "Broadcast IP",
+      "pl": "IP",
+      "zh-cn": "广播节目"
+    },
+    "apiType": {
+      "en": "API type",
+      "de": "API-Typ",
+      "ru": "Тип API",
+      "pt": "Tipo de API",
+      "nl": "API type",
+      "fr": "Type d ' API",
+      "it": "Tipo API",
+      "es": "Tipo de API",
+      "pl": "Typ API",
+      "zh-cn": "一、导 言"
+    },
+    "pollingInterval": {
+      "en": "Poll interval",
+      "de": "Poll-Intervall",
+      "ru": "Опрос интервал",
+      "pt": "Intervalo de Poll",
+      "nl": "Poll interval",
+      "fr": "Intervalle de vote",
+      "it": "Intervallo di pollaggio",
+      "es": "Intervalo de la encuesta",
+      "pl": "Interwał",
+      "zh-cn": "Poll Interval"
+    }
+  },
+  "items": {
+    "ip": {
+      "type": "text",
+      "label": "ip"
+    },
+    "mac":{
+      "type": "text",
+      "label": "mac",
+      "help": {
+        "en": "If you want to use Wake-On-Lan",
+        "de": "Wenn Sie Wake-On-Lan verwenden möchten",
+        "ru": "Если вы хотите использовать Wake-On-Lan",
+        "pt": "Se você quiser usar Wake-On-Lan",
+        "nl": "Als je wakker-On-Lan",
+        "fr": "Si vous voulez utiliser Wake-On-Lan",
+        "it": "Se si desidera utilizzare Wake-On-Lan",
+        "es": "Si quieres usar Wake-On-Lan",
+        "pl": "Jeśli chcesz użyć Wake-On-Lan",
+        "zh-cn": "如果你想使用Wake-On-Lan"
+      }
+    },
+    "broadcastIp": {
+      "newLine": true,
+      "type": "text",
+      "label": "broadcastIp"
+    },
+    "pollingInterval": {
+      "type": "number",
+      "label": "pollingInterval",
+      "min": 3000
+    },
+    "apiVersion": {
+      "newLine": true,
+      "type": "select",
+      "label": "apiVersion",
+      "options": [
+        {
+          "label": "V6",
+          "value": 6
+        },
+        {
+          "label": "V5",
+          "value": 5
+        },
+        {
+          "label": "V1",
+          "value": 1
+        }
+      ]
+    },
+    "apiType": {
+      "type": "select",
+      "label": "apiType",
+      "options": [
+        {
+          "label": "Android",
+          "value": "Android"
+        },
+        {
+          "label": "Jointspace",
+          "value": "Jointspace"
+        }
+      ],
+      "hidden": "data.apiVersion !== 6"
+    },
+    "pleaseLogin": {
+      "style": {
+        "fontSize": "18px",
+        "color": "red",
+        "backgroundColor": "yellow",
+        "margin": "12px",
+        "padding": "4px"
+      },
+      "newLine": true,
+      "type": "staticText",
+      "text": {
+        "en": "Not authenticated. Please start pairing! Then fill in the PIN shown on your TV screen.",
+        "de": "Nicht authentifiziert. Bitte das Pairing starten! Dann den PIN eintragen, welcher auf Ihrem TV-Bildschirm angezeigt wird.",
+        "ru": "Не авторизовано. Пожалуйста, начните парить! Затем заполните PIN-код, показанный на экране вашего ТВ.",
+        "pt": "Não autenticado. Por favor, comece a emparelhar! Em seguida, preencha o PIN mostrado em sua tela de TV.",
+        "nl": "Niet geauthenticeerd. Begin met paren. Vul dan de PIN op je TV-scherm.",
+        "fr": "Pas authentifié. S'il vous plaît commencez à apparier! Ensuite, remplissez le NIP affiché sur votre écran TV.",
+        "it": "Non autenticato. Si prega di iniziare l'accoppiamento! Quindi riempire il PIN mostrato sulla schermata TV.",
+        "es": "No autenticado. ¡Por favor, empieza a emparejar! Luego rellena el PIN mostrado en la pantalla de TV.",
+        "pl": "Nie uwierzył. Proszę się założyć! Wydarzenia w PIN pokazane są na ekranie telewizji.",
+        "zh-cn": "未作核证。 页:1 在你的电视屏幕上展示的PIN的顶。."
+      },
+      "hidden": "!(!data.apiUser && data.apiVersion === 6)"
+    },
+    "pairingButton": {
+      "style": {
+        "backgroundColor": "#4dabf5",
+        "color": "white",
+        "margin": "12px",
+        "padding": "4px"
+      },
+      "newLine": true,
+      "type": "sendTo",
+      "label": "pairingButton",
+      "command": "pairing",
+      "jsonData": "${data.ip}",
+      "hidden": "data.apiVersion !== 6 || data.apiType !== 'Android'"
+    },
+    "pinCode": {
+      "newLine": true,
+      "type": "text",
+      "label": "pinCode",
+      "hidden": "data.apiVersion !== 6 || data.apiType !== 'Android'"
+    },
+    "submitPin": {
+      "style": {
+        "backgroundColor": "#4dabf5",
+        "color": "white",
+        "margin": "12px",
+        "padding": "4px"
+      },
+      "type": "sendTo",
+      "command": "submitPin",
+      "jsonData": "${JSON.stringify(data.pinCode)}",
+      "label": "submitPin",
+      "hidden": "data.apiVersion !== 6 || data.apiType !== 'Android'",
+      "confirm": {
+        "text": {
+          "en": "Please refresh the website after submitting!",
+          "de": "Bitte aktualisieren Sie die Website nach dem Absenden!",
+          "ru": "Пожалуйста, обновите сайт после отправки!",
+          "pt": "Por favor, atualize o site depois de enviar!",
+          "nl": "Verfris de website na het indienen!",
+          "fr": "S'il vous plaît rafraîchir le site après avoir soumis!",
+          "it": "Si prega di aggiornare il sito dopo la presentazione!",
+          "es": "Por favor, refresque el sitio web después de enviar!",
+          "pl": "Po odświeżeniu strony!",
+          "zh-cn": "请提供!"
+        }
+      }
+    },
+    "statusPrefix": {
+      "style": {
+        "fontSize": "18px"
+      },
+      "newLine": true,
+      "type": "staticText",
+      "text": {
+        "en": "User:",
+        "de": "Benutzer:",
+        "ru": "Пользователь:",
+        "pt": "Usuário:",
+        "nl": "User:",
+        "fr": "Utilisateur :",
+        "it": "Utente:",
+        "es": "Usuario:",
+        "pl": "Użytkownicy:",
+        "zh-cn": "用户:"
+      },
+      "hidden": "!data.apiUser || data.apiVersion !== 6 || data.apiType !== 'Android'"
+    },
+    "statusUser": {
+      "style": {
+        "fontSize": "18px"
+      },
+      "type": "staticText",
+      "hidden": "!data.apiUser || data.apiVersion !== 6 || data.apiType !== 'Android'",
+      "text": "${data.apiUser}"
+    }
+  }
+}
