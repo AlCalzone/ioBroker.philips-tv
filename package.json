@@ -4,7 +4,7 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "description": "Adapter to control Philips TVs based on Android",
+  "description": "Adapter to control Philips TVs",
   "author": {
     "name": "AlCalzone",
     "email": "d.griesel@gmx.net"

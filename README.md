@@ -1,17 +1,17 @@
-![Logo](admin/philips-tv-android.png)
-# ioBroker.philips-tv-android
+![Logo](admin/philips-tv.png)
+# ioBroker.philips-tv
 
-[![NPM version](https://img.shields.io/npm/v/iobroker.philips-tv-android.svg)](https://www.npmjs.com/package/iobroker.philips-tv-android)
-[![Downloads](https://img.shields.io/npm/dm/iobroker.philips-tv-android.svg)](https://www.npmjs.com/package/iobroker.philips-tv-android)
-![Number of Installations](https://iobroker.live/badges/philips-tv-android-installed.svg)
-![Current version in stable repository](https://iobroker.live/badges/philips-tv-android-stable.svg)
+[![NPM version](https://img.shields.io/npm/v/iobroker.philips-tv.svg)](https://www.npmjs.com/package/iobroker.philips-tv)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.philips-tv.svg)](https://www.npmjs.com/package/iobroker.philips-tv)
+![Number of Installations](https://iobroker.live/badges/philips-tv-installed.svg)
+![Current version in stable repository](https://iobroker.live/badges/philips-tv-stable.svg)
 
-[![NPM](https://nodei.co/npm/iobroker.philips-tv-android.png?downloads=true)](https://nodei.co/npm/iobroker.philips-tv-android/)
+[![NPM](https://nodei.co/npm/iobroker.philips-tv.png?downloads=true)](https://nodei.co/npm/iobroker.philips-tv/)
 
-**Tests:** ![Test and Release](https://github.com/foxriver76/ioBroker.philips-tv-android/workflows/Test%20and%20Release/badge.svg)
+**Tests:** ![Test and Release](https://github.com/AlCalzone/ioBroker.philips-tv/workflows/Test%20and%20Release/badge.svg)
 
-## Philips TV Android adapter for ioBroker
-Adapter to control Philips TVs based on Android
+## Philips TV adapter for ioBroker
+Adapter to control Philips TVs via network
 
 ## Disclaimer
 The developers of this module are in no way endorsed by or affiliated with Koninklijke Philips N.V., 
