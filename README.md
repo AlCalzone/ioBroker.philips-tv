@@ -22,6 +22,9 @@ or any associated subsidiaries, logos or trademarks.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### 0.3.1 (2022-09-16)
+* (foxriver76) added admin v5 dependency
+
 ### 0.3.0 (2022-09-12)
 * (foxriver76) adapter rework to support Android and JointSpace V6 API
 * __BREAKING__: Please use the adapter config to configure this instance properly

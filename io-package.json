@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "philips-tv",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "news": {
+      "0.3.1": {
+        "en": "added admin v5 dependency",
+        "de": "admin v5 abhängigkeit",
+        "ru": "добавлена админ v5 зависимость",
+        "pt": "adicionado administrador v5 dependência",
+        "nl": "admin v5 afhankelijkheid",
+        "fr": "ajouté admin v5 dépendance",
+        "it": "aggiunto admin v5 dipendenza",
+        "es": "administración v5 dependencia",
+        "pl": "admin v5",
+        "zh-cn": "增 减"
+      },
       "0.3.0": {
         "en": "adapter rework to support Android and JointSpace V6 API",
         "de": "adapter-Rework zur Unterstützung von Android und JointSpace V6 API",
@@ -77,6 +89,11 @@
     "dependencies": [
       {
         "js-controller": ">=4.0.0"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=5.0.0"
       }
     ]
   },
