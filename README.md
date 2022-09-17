@@ -22,6 +22,9 @@ or any associated subsidiaries, logos or trademarks.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### 0.3.2 (2022-09-17)
+* (foxriver76) corrected button `PlayPause` to lowercase `playPause`
+
 ### 0.3.1 (2022-09-16)
 * (foxriver76) added admin v5 dependency
 

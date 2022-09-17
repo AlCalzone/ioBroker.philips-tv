@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "philips-tv",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "news": {
+      "0.3.2": {
+        "en": "corrected button `PlayPause` to lowercase `playPause`",
+        "de": "berichtigte Taste PlayPause zu Kleiner spielenPause",
+        "ru": "исправлена кнопка PlayPause, чтобы опустить playPause",
+        "pt": "botão corrigido PlayPause para jogar minúscula",
+        "nl": "vertaling:",
+        "fr": "bouton corrigé PlayPause to lowercase playPause",
+        "it": "pulsante corretto PlayPause per abbassare il giocoPausa",
+        "es": "botón corregido PlayPause to lowercase playPause",
+        "pl": "poprawiony przycisk PlayPause do gryPause",
+        "zh-cn": "更正但顿·帕莱图"
+      },
       "0.3.1": {
         "en": "added admin v5 dependency",
         "de": "admin v5 abhängigkeit",
@@ -314,7 +326,7 @@
       "native": {}
     },
     {
-      "_id": "keys.PlayPause",
+      "_id": "keys.playPause",
       "type": "state",
       "common": {
         "role": "button",
