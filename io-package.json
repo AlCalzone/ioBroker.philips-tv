@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "philips-tv",
-    "version": "0.3.2",
+    "version": "0.4.0",
     "news": {
+      "0.4.0": {
+        "en": "marked state definitions of launch commands to be read-only\nwe now use the real device name for the device object\nworkaround to switch hdmi input via Google Assistant",
+        "de": "markierte zustandsdefinitionen von startbefehlen, die nur gelesen werden sollen\nwir verwenden nun den realen gerätenamen für das geräteobjekt\nworkaround um hdmi Eingabe über Google Assistant zu wechseln",
+        "ru": "помеченные государственные определения команд запуска, которые будут читать только\nмы теперь используем настоящее имя устройства для объекта устройства\nworkaround, чтобы переключить hdmi вход через Google Assistant",
+        "pt": "definições de estado marcadas de comandos de lançamento a ser somente leitura\nagora usamos o nome do dispositivo real para o objeto do dispositivo\nsolução para mudar a entrada do hdmi via Google Assistant",
+        "nl": "gemarkeerde staatsdefinitie van lanceringsbevelen om te lezen\nwe gebruiken nu de echte apparaatnaam voor het object\nwerk om HDmi input te wisselen via Google Assistent",
+        "fr": "définitions d'état marquées des commandes de lancement à lire seulement\nnous utilisons maintenant le vrai nom de périphérique pour l'objet de périphérique\nde travail pour changer l'entrée hdmi via Google Assistant",
+        "it": "marcate definizioni di stato dei comandi di lancio da leggere\nusiamo ora il vero nome del dispositivo per l'oggetto del dispositivo\nworkaround per attivare hdmi tramite Google Assistant",
+        "es": "definiciones de estado marcadas de comandos de lanzamiento para ser sólo lectura\nahora utilizamos el nombre real del dispositivo para el objeto del dispositivo\nsolución para cambiar la entrada hdmi vía Google Assistant",
+        "pl": "określona definicja dowództwa startowych jest gotowa do odczytu\nobecnie używamy prawdziwego imienia dla obiektu urządzenia\npracownicy przełączają hdmi wejściowy poprzez Google Assistant",
+        "zh-cn": "标示的发射指挥定义应改为\n我们现在使用装置物体的真正装置名称\n努力通过谷歌助理转用山素投入"
+      },
       "0.3.2": {
         "en": "corrected button `PlayPause` to lowercase `playPause`",
         "de": "berichtigte Taste PlayPause zu Kleiner spielenPause",

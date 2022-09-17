@@ -22,6 +22,11 @@ or any associated subsidiaries, logos or trademarks.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### 0.4.0 (2022-09-17)
+* (foxriver76) marked state definitions of launch commands to be read-only
+* (foxriver76) we now use the real device name for the device object
+* (foxriver76) workaround to switch hdmi input via Google Assistant
+
 ### 0.3.2 (2022-09-17)
 * (foxriver76) corrected button `PlayPause` to lowercase `playPause`
 

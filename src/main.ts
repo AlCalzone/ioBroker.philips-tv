@@ -176,18 +176,7 @@ class PhilipsTvAndroid extends utils.Adapter {
             return;
         }
 
-        if (command === 'power') {
-            try {
-                if (this.config.mac && state.val) {
-                    this.log.debug(`WOL to ${this.config.mac}`);
-                    await this.tv.turnOn();
-                } else {
-                    await this.tv.setPowerState(state.val as boolean);
-                }
-            } catch (e) {
-                this.log.error(`Could not change power state: ${this.errorToText(e)}`);
-            }
-        } else if (channel === 'keys') {
+        if (channel === 'keys') {
             const keyName = command.charAt(0).toUpperCase() + command.substring(1);
             this.log.debug(`Sending key "${keyName}"`);
             try {
@@ -195,82 +184,119 @@ class PhilipsTvAndroid extends utils.Adapter {
             } catch (e) {
                 this.log.error(`Could not send key "${keyName}": ${this.errorToText(e)}`);
             }
-        } else if (command === 'volume') {
-            try {
-                await this.tv.setVolume(state.val as number);
-            } catch (e) {
-                this.log.error(`Could not change volume: ${this.errorToText(e)}`);
-            }
-        } else if (command === 'muted') {
-            try {
-                await this.tv.setMute(state.val as boolean);
-            } catch (e) {
-                this.log.error(`Could not change mute status: ${this.errorToText(e)}`);
-            }
-        } else if (command === 'launchApp') {
-            const appName = state.val as string;
+            return;
+        }
 
-            if (!this.apps) {
-                this.log.error(`No apps cached, cannot launch "${appName}"`);
-                return;
-            }
-
-            const matchingApp = this.apps.applications.find(entry => entry.label === appName);
-
-            if (matchingApp) {
+        switch (command) {
+            case 'power':
                 try {
-                    await this.tv.launchApplication(matchingApp as any);
+                    if (this.config.mac && state.val) {
+                        this.log.debug(`WOL to ${this.config.mac}`);
+                        await this.tv.turnOn();
+                    } else {
+                        await this.tv.setPowerState(state.val as boolean);
+                    }
                 } catch (e) {
-                    this.log.error(`Could not launch application "${appName}": ${this.errorToText(e)}`);
+                    this.log.error(`Could not change power state: ${this.errorToText(e)}`);
                 }
-            } else {
-                this.log.error(`Application "${appName}" not found`);
-            }
-        } else if (command === 'launchTvChannel') {
-            const channelName = state.val as string;
-
-            if (!this.channels) {
-                this.log.error(`No channels cached, cannot launch "${channelName}"`);
-                return;
-            }
-
-            const matchingChannel = this.channels.Channel.find(entry => entry.name === channelName);
-
-            if (matchingChannel) {
+                break;
+            case 'volume':
                 try {
-                    const requestedChannel: Partial<ActiveChannelObject> = { channel: matchingChannel };
-
-                    const currentChannel = (await this.tv.getCurrentTVChannel()) as ActiveChannelObject;
-                    requestedChannel.channelList = currentChannel.channelList;
-
-                    await this.tv.launchTVChannel(requestedChannel as any);
+                    await this.tv.setVolume(state.val as number);
                 } catch (e) {
-                    this.log.error(`Could not launch TV channel "${channelName}": ${this.errorToText(e)}`);
+                    this.log.error(`Could not change volume: ${this.errorToText(e)}`);
                 }
-            } else {
-                this.log.error(`Channel "${channelName}" not found`);
-            }
-        } else if (command === 'ambilightPlusHueActive') {
-            try {
-                await this.tv.setAmbilightPlusHueState(state.val as boolean);
-            } catch (e) {
-                this.log.error(`Could not change Ambilight + Hue state: ${this.errorToText(e)}`);
-            }
-        } else if (command === 'ambilightActive') {
-            try {
-                await this.tv.setAmbilightState(state.val as boolean);
-            } catch (e) {
-                this.log.error(`Could not change Ambilight state: ${this.errorToText(e)}`);
-            }
-        } else if (command === 'customAmbilightCommand') {
-            try {
-                await this.tv.sendCustomAmbilightCmd(JSON.parse(state.val as string));
-                await this.setForeignStateAsync(id, state.val, true);
-            } catch (e) {
-                this.log.error(`Could not send custom Ambilight command: ${this.errorToText(e)}`);
-            }
-        } else {
-            this.log.warn(`No command implemented for stateChange of "${id}"`);
+                break;
+            case 'muted':
+                try {
+                    await this.tv.setMute(state.val as boolean);
+                } catch (e) {
+                    this.log.error(`Could not change mute status: ${this.errorToText(e)}`);
+                }
+                break;
+            case 'launchApp':
+                const appName = state.val as string;
+
+                if (!this.apps) {
+                    this.log.error(`No apps cached, cannot launch "${appName}"`);
+                    return;
+                }
+
+                const matchingApp = this.apps.applications.find(entry => entry.label === appName);
+
+                if (matchingApp) {
+                    try {
+                        await this.tv.launchApplication(matchingApp as any);
+                    } catch (e) {
+                        this.log.error(`Could not launch application "${appName}": ${this.errorToText(e)}`);
+                    }
+                } else {
+                    this.log.error(`Application "${appName}" not found`);
+                }
+                break;
+            case 'launchTvChannel':
+                const channelName = state.val as string;
+
+                if (!this.channels) {
+                    this.log.error(`No channels cached, cannot launch "${channelName}"`);
+                    return;
+                }
+
+                const matchingChannel = this.channels.Channel.find(entry => entry.name === channelName);
+
+                if (matchingChannel) {
+                    try {
+                        const requestedChannel: Partial<ActiveChannelObject> = { channel: matchingChannel };
+
+                        const currentChannel = (await this.tv.getCurrentTVChannel()) as ActiveChannelObject;
+                        requestedChannel.channelList = currentChannel.channelList;
+
+                        await this.tv.launchTVChannel(requestedChannel as any);
+                    } catch (e) {
+                        this.log.error(`Could not launch TV channel "${channelName}": ${this.errorToText(e)}`);
+                    }
+                } else {
+                    this.log.error(`Channel "${channelName}" not found`);
+                }
+                break;
+            case 'ambilightPlusHueActive':
+                try {
+                    await this.tv.setAmbilightPlusHueState(state.val as boolean);
+                } catch (e) {
+                    this.log.error(`Could not change Ambilight + Hue state: ${this.errorToText(e)}`);
+                }
+                break;
+            case 'ambilightActive':
+                try {
+                    await this.tv.setAmbilightState(state.val as boolean);
+                } catch (e) {
+                    this.log.error(`Could not change Ambilight state: ${this.errorToText(e)}`);
+                }
+                break;
+            case 'customAmbilightCommand':
+                try {
+                    await this.tv.sendCustomAmbilightCmd(JSON.parse(state.val as string));
+                    await this.setForeignStateAsync(id, state.val, true);
+                } catch (e) {
+                    this.log.error(`Could not send custom Ambilight command: ${this.errorToText(e)}`);
+                }
+                break;
+            case 'hdmiInputGoogleAssistant':
+                const googleAssistantCommand = {
+                    intent: {
+                        extras: { query: `HDMI ${state.val}` },
+                        action: 'Intent {  act=android.intent.action.ASSIST cmp=com.google.android.katniss/com.google.android.apps.tvsearch.app.launch.trampoline.SearchActivityTrampoline flg=0x10200000 }',
+                        component: {
+                            packageName: 'com.google.android.katniss',
+                            className: 'com.google.android.apps.tvsearch.app.launch.trampoline.SearchActivityTrampoline'
+                        }
+                    }
+                };
+
+                await this.tv.launchApplication(googleAssistantCommand as any);
+                break;
+            default:
+                this.log.warn(`No command implemented for stateChange of "${id}"`);
         }
     }
 
@@ -426,9 +452,21 @@ class PhilipsTvAndroid extends utils.Adapter {
                     role: 'text',
                     name: 'Launch application',
                     type: 'string',
-                    read: true,
+                    read: false,
                     write: true,
                     states: appLabels
+                },
+                native: {}
+            });
+
+            await this.extendObjectAsync('settings.hdmiInputGoogleAssistant', {
+                type: 'state',
+                common: {
+                    role: 'value',
+                    name: 'Switch HDMI input',
+                    type: 'number',
+                    read: false,
+                    write: true
                 },
                 native: {}
             });
@@ -450,7 +488,7 @@ class PhilipsTvAndroid extends utils.Adapter {
                     role: 'text',
                     name: 'Launch TV channel',
                     type: 'string',
-                    read: true,
+                    read: false,
                     write: true,
                     states: channelNames
                 },
@@ -535,7 +573,8 @@ class PhilipsTvAndroid extends utils.Adapter {
                 // @ts-expect-error we are allowed to create this as device
                 type: 'device',
                 common: {
-                    name: 'Philips TV'
+                    // @ts-expect-error types in lib missing
+                    name: res.name
                 },
                 native: res
             });
