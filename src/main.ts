@@ -1,5 +1,7 @@
 import * as utils from '@iobroker/adapter-core';
 import { PhilipsTV, Authentication, PhilipsTVConfig } from '@konradknitter/philipsandroidtv';
+// this should prevent ESCOKETTIMEDOUT
+process.env.UV_THREADPOOL_SIZE = '64';
 
 interface ApplicationCache {
     version: number;
@@ -21,17 +23,6 @@ interface IntentObject {
         className: string;
     };
     action: string;
-}
-
-interface VolumeObject {
-    current: number;
-    min: number;
-    max: number;
-    muted: boolean;
-}
-
-interface PowerObject {
-    powerstate: 'On' | 'Standby';
 }
 
 interface TVCache {
@@ -389,11 +380,11 @@ class PhilipsTvAndroid extends utils.Adapter {
         }
 
         try {
-            const volumeRes: VolumeObject = await this.tv.getVolume();
+            const volumeRes = await this.tv.getVolume();
             await this.setStateAsync('settings.volume', volumeRes.current, true);
             await this.setStateAsync('settings.muted', volumeRes.muted, true);
 
-            const powerRes: PowerObject = await this.tv.getPowerState();
+            const powerRes = await this.tv.getPowerState();
             await this.setStateAsync('settings.power', powerRes.powerstate === 'On', true);
             await this.setStateChangedAsync('info.connection', true, true);
 

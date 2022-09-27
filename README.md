@@ -22,6 +22,9 @@ or any associated subsidiaries, logos or trademarks.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### 0.4.1 (2022-09-27)
+* (foxriver76) try to fix `ESOCKETTIMEDOUT`
+
 ### 0.4.0 (2022-09-17)
 * (foxriver76) marked state definitions of launch commands to be read-only
 * (foxriver76) we now use the real device name for the device object

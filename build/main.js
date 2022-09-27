@@ -19,6 +19,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_philipsandroidtv = require("@konradknitter/philipsandroidtv");
+process.env.UV_THREADPOOL_SIZE = "64";
 class PhilipsTvAndroid extends utils.Adapter {
   constructor(options = {}) {
     super({
