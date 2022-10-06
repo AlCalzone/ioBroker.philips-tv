@@ -22,7 +22,7 @@ or any associated subsidiaries, logos or trademarks.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### 0.4.2 (2022-10-06)
+### 0.4.3 (2022-10-06)
 * (foxriver76) try to fix `ESOCKETTIMEDOUT`
 
 ### 0.4.0 (2022-09-17)
