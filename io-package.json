@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "philips-tv",
-    "version": "0.4.4",
+    "version": "0.4.5",
     "news": {
+      "0.4.5": {
+        "en": "fixed communication with API",
+        "de": "feste Kommunikation mit API",
+        "ru": "фиксированная связь с API",
+        "pt": "comunicação fixa com API",
+        "nl": "vertaling:",
+        "fr": "communication fixe avec API",
+        "it": "comunicazione fissa con API",
+        "es": "comunicación fija con API",
+        "pl": "stała komunikacja z API",
+        "zh-cn": "a. 与消费者协会定期联系"
+      },
       "0.4.4": {
         "en": "fix build",
         "de": "fehlersuche",
@@ -74,18 +86,6 @@
         "es": "botón corregido PlayPause to lowercase playPause",
         "pl": "poprawiony przycisk PlayPause do gryPause",
         "zh-cn": "更正但顿·帕莱图"
-      },
-      "0.3.1": {
-        "en": "added admin v5 dependency",
-        "de": "admin v5 abhängigkeit",
-        "ru": "добавлена админ v5 зависимость",
-        "pt": "adicionado administrador v5 dependência",
-        "nl": "admin v5 afhankelijkheid",
-        "fr": "ajouté admin v5 dépendance",
-        "it": "aggiunto admin v5 dipendenza",
-        "es": "administración v5 dependencia",
-        "pl": "admin v5",
-        "zh-cn": "增 减"
       }
     },
     "titleLang": {
