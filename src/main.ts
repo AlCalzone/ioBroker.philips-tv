@@ -1,7 +1,5 @@
 import * as utils from '@iobroker/adapter-core';
-import { PhilipsTV, Authentication, PhilipsTVConfig } from '@konradknitter/philipsandroidtv';
-// this should prevent ESCOKETTIMEDOUT
-process.env.UV_THREADPOOL_SIZE = '64';
+import { PhilipsTV, Authentication, PhilipsTVConfig } from 'philips-tv-api';
 
 interface ApplicationCache {
     version: number;
