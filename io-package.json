@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "philips-tv",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "news": {
+      "0.4.4": {
+        "en": "fix build",
+        "de": "fehlersuche",
+        "ru": "исправить build",
+        "pt": "conserto de correção",
+        "nl": "opbouwen",
+        "fr": "correction",
+        "it": "fix build",
+        "es": "fijar",
+        "pl": "zbudować",
+        "zh-cn": "f 固定建筑"
+      },
       "0.4.3": {
         "en": "try to fix `ESOCKETTIMEDOUT`",
         "de": "versuchen, ESOCKETTIMEDOUT zu beheben",
@@ -74,18 +86,6 @@
         "es": "administración v5 dependencia",
         "pl": "admin v5",
         "zh-cn": "增 减"
-      },
-      "0.3.0": {
-        "en": "adapter rework to support Android and JointSpace V6 API",
-        "de": "adapter-Rework zur Unterstützung von Android und JointSpace V6 API",
-        "ru": "переработка адаптера для поддержки Android и JointSpace V6 API",
-        "pt": "retrabalho do adaptador para suportar a API do Android e JointSpace V6",
-        "nl": "adapter Rework om Android en JointSpace V6 API",
-        "fr": "retravail adaptateur pour soutenir Android et l'API JointSpace V6",
-        "it": "adattatore di lavoro per supportare Android e JointSpace V6 API",
-        "es": "adaptador rework para apoyar Android y JointSpace V6 API",
-        "pl": "dostosowywanie do Androida i JointSpace V6",
-        "zh-cn": "b. 适应行动"
       }
     },
     "titleLang": {

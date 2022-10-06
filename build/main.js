@@ -18,8 +18,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var utils = __toESM(require("@iobroker/adapter-core"));
-var import_philipsandroidtv = require("@konradknitter/philipsandroidtv");
-process.env.UV_THREADPOOL_SIZE = "64";
+var import_philips_tv_api = require("philips-tv-api");
 class PhilipsTvAndroid extends utils.Adapter {
   constructor(options = {}) {
     super({
@@ -60,7 +59,7 @@ class PhilipsTvAndroid extends utils.Adapter {
       apiType: this.config.apiType
     };
     try {
-      this.tv = new import_philipsandroidtv.PhilipsTV(this.config.ip, this.config.mac, auth, tvConfig, "ioBroker");
+      this.tv = new import_philips_tv_api.PhilipsTV(this.config.ip, this.config.mac, auth, tvConfig, "ioBroker");
       if (!(this.config.apiUser || this.config.apiPass) && this.tv.requiresPairing()) {
         this.log.warn("Please authenticate via the adapter configuration page");
         return;
@@ -249,7 +248,7 @@ class PhilipsTvAndroid extends utils.Adapter {
   }
   async startPairing(ip) {
     this.log.info("Start pairing process");
-    this.tv = new import_philipsandroidtv.PhilipsTV(ip, void 0, void 0, void 0, "ioBroker");
+    this.tv = new import_philips_tv_api.PhilipsTV(ip, void 0, void 0, void 0, "ioBroker");
     const result = await this.tv.requestPair();
     if (typeof result.timestamp === "number") {
       this.authTimestamp = result.timestamp;
