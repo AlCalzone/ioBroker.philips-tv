@@ -22,6 +22,9 @@ or any associated subsidiaries, logos or trademarks.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### 0.5.1 (2022-10-17)
+* (foxriver76) fix `ESOCKETTIMEDOUT` on post requests
+
 ### 0.5.0 (2022-10-17)
 * (foxriver76) added new state `hdmiInput` without relying on Google Assistant
 
