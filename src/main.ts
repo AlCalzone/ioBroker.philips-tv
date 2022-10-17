@@ -1,5 +1,5 @@
 import * as utils from '@iobroker/adapter-core';
-import { PhilipsTV, Authentication, PhilipsTVConfig } from 'philips-tv-api';
+import { PhilipsTV, Authentication, PhilipsTVConfig, Input } from 'philips-tv-api';
 
 interface ApplicationCache {
     version: number;
@@ -65,6 +65,7 @@ class PhilipsTvAndroid extends utils.Adapter {
     private ambilightSupported = false;
     private ambilightPlusHueSupported = false;
     private firstPoll = true;
+    private setSourceSupported = false;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -282,8 +283,12 @@ class PhilipsTvAndroid extends utils.Adapter {
                     }
                 };
 
-                await this.tv.launchApplication(googleAssistantCommand as any);
+                await this.tv.launchApplication(googleAssistantCommand);
                 break;
+            case 'hdmiInput': {
+                await this.tv.setSource(state.val as Input);
+                break;
+            }
             default:
                 this.log.warn(`No command implemented for stateChange of "${id}"`);
         }
@@ -404,6 +409,7 @@ class PhilipsTvAndroid extends utils.Adapter {
 
                 // also extend the min/max correctly for volume once
                 await this.extendObjectAsync('settings.volume', { common: { min: volumeRes.min, max: volumeRes.max } });
+                await this.checkSetSourceSupport();
                 await this.checkAmbilightPlusHueSupport();
                 await this.checkAmbilightSupport();
                 await this.syncSystemInfo();
@@ -529,6 +535,34 @@ class PhilipsTvAndroid extends utils.Adapter {
     }
 
     /**
+     * Checks if setSource is supported, creates states and sets flag
+     */
+    private async checkSetSourceSupport(): Promise<void> {
+        try {
+            if (await this.tv!.supportsSetSource()) {
+                this.setSourceSupported = true;
+                await this.extendObjectAsync('settings.hdmiInput', {
+                    type: 'state',
+                    common: {
+                        role: 'text',
+                        name: 'Switch source',
+                        type: 'string',
+                        read: false,
+                        write: true,
+                        states: ['HDMI 1', 'HDMI 2', 'HDMI 3', 'HDMI 4']
+                    },
+                    native: {}
+                });
+            } else {
+                this.setSourceSupported = false;
+            }
+        } catch (e) {
+            this.log.warn(`No "setSource" support: ${this.errorToText(e)}`);
+            this.setSourceSupported = false;
+        }
+    }
+
+    /**
      * Checks if the TV supports ambilight plus Hue, if so the state is created an flag is set
      */
     private async checkAmbilightPlusHueSupport(): Promise<void> {
@@ -562,7 +596,6 @@ class PhilipsTvAndroid extends utils.Adapter {
                 // @ts-expect-error we are allowed to create this as device
                 type: 'device',
                 common: {
-                    // @ts-expect-error types in lib missing
                     name: res.name
                 },
                 native: res

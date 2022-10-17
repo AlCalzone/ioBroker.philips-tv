@@ -1,6 +1,6 @@
 {
   "name": "iobroker.philips-tv",
-  "version": "0.4.5",
+  "version": "0.5.0",
   "engines": {
     "node": ">=14.0.0"
   },
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "^2.6.2",
-    "philips-tv-api": "https://github.com/foxriver76/philipsandroidtv/tarball/5060829a2c23c1865de792d9583a19cba5ab6ba5"
+    "philips-tv-api": "https://github.com/foxriver76/philipsandroidtv/tarball/f08a14d533ed171b16055922457a56d6b151938c"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^3.5.9",

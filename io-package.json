@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "philips-tv",
-    "version": "0.4.5",
+    "version": "0.5.0",
     "news": {
+      "0.5.0": {
+        "en": "added new state `hdmiInput` without relying on Google Assistant",
+        "de": "neue Bundesstaat hdmiInput ohne Google Assistant",
+        "ru": "добавил новое состояние hdmiInput, не полагаясь на Google Assistant",
+        "pt": "adicionado novo estado hdmiInput sem confiar no Google Assistant",
+        "nl": "vertaling:",
+        "fr": "ajout de nouveaux états hdmiInput sans compter sur Google Assistant",
+        "it": "aggiunto nuovo stato hdmiInput senza contare su Google Assistant",
+        "es": "nuevo estado hdmiInput sin depender de Google Assistant",
+        "pl": "dodał nowy stan hdmiInput, bez ponownego polegania na Google Assistant",
+        "uk": "додано новий стан hdmiInput без relying на Google Assistant",
+        "zh-cn": "加上新的州山素,而不依靠谷歌助理"
+      },
       "0.4.5": {
         "en": "fixed communication with API",
         "de": "feste Kommunikation mit API",
@@ -74,18 +87,6 @@
         "es": "definiciones de estado marcadas de comandos de lanzamiento para ser sólo lectura\nahora utilizamos el nombre real del dispositivo para el objeto del dispositivo\nsolución para cambiar la entrada hdmi vía Google Assistant",
         "pl": "określona definicja dowództwa startowych jest gotowa do odczytu\nobecnie używamy prawdziwego imienia dla obiektu urządzenia\npracownicy przełączają hdmi wejściowy poprzez Google Assistant",
         "zh-cn": "标示的发射指挥定义应改为\n我们现在使用装置物体的真正装置名称\n努力通过谷歌助理转用山素投入"
-      },
-      "0.3.2": {
-        "en": "corrected button `PlayPause` to lowercase `playPause`",
-        "de": "berichtigte Taste PlayPause zu Kleiner spielenPause",
-        "ru": "исправлена кнопка PlayPause, чтобы опустить playPause",
-        "pt": "botão corrigido PlayPause para jogar minúscula",
-        "nl": "vertaling:",
-        "fr": "bouton corrigé PlayPause to lowercase playPause",
-        "it": "pulsante corretto PlayPause per abbassare il giocoPausa",
-        "es": "botón corregido PlayPause to lowercase playPause",
-        "pl": "poprawiony przycisk PlayPause do gryPause",
-        "zh-cn": "更正但顿·帕莱图"
       }
     },
     "titleLang": {

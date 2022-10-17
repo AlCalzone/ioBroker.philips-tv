@@ -29,6 +29,7 @@ class PhilipsTvAndroid extends utils.Adapter {
     this.ambilightSupported = false;
     this.ambilightPlusHueSupported = false;
     this.firstPoll = true;
+    this.setSourceSupported = false;
     this.on("ready", this.onReady.bind(this));
     this.on("stateChange", this.onStateChange.bind(this));
     this.on("message", this.onMessage.bind(this));
@@ -204,6 +205,10 @@ class PhilipsTvAndroid extends utils.Adapter {
         };
         await this.tv.launchApplication(googleAssistantCommand);
         break;
+      case "hdmiInput": {
+        await this.tv.setSource(state.val);
+        break;
+      }
       default:
         this.log.warn(`No command implemented for stateChange of "${id}"`);
     }
@@ -291,6 +296,7 @@ class PhilipsTvAndroid extends utils.Adapter {
         await this.cacheApps();
         await this.cacheChannels();
         await this.extendObjectAsync("settings.volume", { common: { min: volumeRes.min, max: volumeRes.max } });
+        await this.checkSetSourceSupport();
         await this.checkAmbilightPlusHueSupport();
         await this.checkAmbilightSupport();
         await this.syncSystemInfo();
@@ -390,6 +396,30 @@ class PhilipsTvAndroid extends utils.Adapter {
     } catch (e) {
       this.ambilightSupported = false;
       this.log.debug(`No Ambilight plus Hue support: ${this.errorToText(e)}`);
+    }
+  }
+  async checkSetSourceSupport() {
+    try {
+      if (await this.tv.supportsSetSource()) {
+        this.setSourceSupported = true;
+        await this.extendObjectAsync("settings.hdmiInput", {
+          type: "state",
+          common: {
+            role: "text",
+            name: "Switch source",
+            type: "string",
+            read: false,
+            write: true,
+            states: ["HDMI 1", "HDMI 2", "HDMI 3", "HDMI 4"]
+          },
+          native: {}
+        });
+      } else {
+        this.setSourceSupported = false;
+      }
+    } catch (e) {
+      this.log.warn(`No "setSource" support: ${this.errorToText(e)}`);
+      this.setSourceSupported = false;
     }
   }
   async checkAmbilightPlusHueSupport() {
