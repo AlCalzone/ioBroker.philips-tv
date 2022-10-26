@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "philips-tv",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "news": {
+      "0.5.2": {
+        "en": "* we renamed `customAmbilightCommand` to `currentAmbilightConfiguration` and update the state on polling (closes #431)\nPlease delete `customAmbilightCommand` manually",
+        "de": "* wir umbenannt benutzerdefinierteAmbilight Befehl zur aktuellenAmbilightKonfiguration und Aktualisierung des Zustands bei der Umfrage (schließt #431)\nBitte löschen Sie customAmbilight Befehl manuell",
+        "ru": "* мы переименовали customAmbilight Команда to currentAmbilightКонфигурация и обновление состояния на опрос (closes #431)\nПожалуйста, удалите customAmbilight Команда вручную",
+        "pt": "* nós renomeamos customAmbilight Comando à configuração atualAmbilight e atualize o estado em votação (fecha #431)\nPor favor, exclua customAmbilight Comando manualmente",
+        "nl": "♪ we hernoemde de gewoonte Commando aan de huidige AmbilightConfiguration en de staat updaten over vervuiling (closes 431)\nVerwijder de gewoonte Commando handmatig",
+        "fr": "* nous avons renommé customAmbilight Commande à l'AmbilightConfiguration actuelle et mise à jour de l'état sur le vote (ferme #431)\nVeuillez supprimer customAmbilight Commande manuelle",
+        "it": "* abbiamo rinominato personalizzatoAmbilight Comando alla correnteAmbilightConfiguration e aggiorna lo stato sull'inquinamento (chiude #431)\nSi prega di eliminare personalizzatoAmbilight Comando manualmente",
+        "es": "* we renamed customAmbilight Comando a la corrienteAmbilightConfiguración y actualización del estado en la encuesta (cerca #431)\nPor favor, eliminar customAmbilight Mando manualmente",
+        "pl": "* zmieniło nazwę na Ambilight. Dowództwo nad konfiguracją i aktualizacją stanu na zanieczyszczeniu (zawiera #431)\nPozwoliło to na usunięcie klienta. ręcznie",
+        "uk": "* Ми перейменовані на CustomAmbilight Команда поточногоAmbilightConfiguration та оновлення стану на опитуванні (закриває #431)\nБудь ласка, видаліть CustomAmbilight Команда",
+        "zh-cn": "* 我们改名为习俗Ambieau 对当前阿姆比松的控制和更新投票情况(第431号结论)\n请删除习俗 手工指挥"
+      },
       "0.5.1": {
         "en": "fix `ESOCKETTIMEDOUT` on post requests",
         "de": "eSOCKETTIMEDOUT auf Postanfragen beheben",
@@ -66,18 +79,6 @@
         "zh-cn": "试图确定ESOCKETTIMEDOUT"
       },
       "0.4.2": {
-        "en": "try to fix `ESOCKETTIMEDOUT`",
-        "de": "versuchen, ESOCKETTIMEDOUT zu beheben",
-        "ru": "попробуйте исправить ESOCKETTIMEDOUT",
-        "pt": "tentar corrigir ESOCKETTIMEDOUT",
-        "nl": "probeer ESOCKETTIMEDOUT",
-        "fr": "essayez de réparer ESOCKETTIMEDOUT",
-        "it": "cercare di risolvere ESOCKETTIMEDOUT",
-        "es": "tratar de arreglar ESOCKETTIMEDOUT",
-        "pl": "próbuje naprawić ESOCKETTIMEDOUT",
-        "zh-cn": "试图确定ESOCKETTIMEDOUT"
-      },
-      "0.4.1": {
         "en": "try to fix `ESOCKETTIMEDOUT`",
         "de": "versuchen, ESOCKETTIMEDOUT zu beheben",
         "ru": "попробуйте исправить ESOCKETTIMEDOUT",

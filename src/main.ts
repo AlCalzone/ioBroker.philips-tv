@@ -263,12 +263,12 @@ class PhilipsTvAndroid extends utils.Adapter {
                     this.log.error(`Could not change Ambilight state: ${this.errorToText(e)}`);
                 }
                 break;
-            case 'customAmbilightCommand':
+            case 'currentAmbilightConfiguration':
                 try {
                     await this.tv.sendCustomAmbilightCmd(JSON.parse(state.val as string));
                     await this.setForeignStateAsync(id, state.val, true);
                 } catch (e) {
-                    this.log.error(`Could not send custom Ambilight command: ${this.errorToText(e)}`);
+                    this.log.error(`Could not set Ambilight configuration: ${this.errorToText(e)}`);
                 }
                 break;
             case 'hdmiInputGoogleAssistant':
@@ -394,6 +394,9 @@ class PhilipsTvAndroid extends utils.Adapter {
             if (this.ambilightSupported) {
                 const ambiState = await this.tv.getAmbilightState();
                 await this.setStateAsync('settings.ambilightActive', ambiState, true);
+
+                const ambiConfig = await this.tv.getCurrentAmbilightConfiguration();
+                await this.setStateAsync('settings.currentAmbilightConfiguration', JSON.stringify(ambiConfig), true);
             }
 
             if (this.ambilightPlusHueSupported) {
@@ -513,7 +516,7 @@ class PhilipsTvAndroid extends utils.Adapter {
                 native: {}
             });
 
-            await this.extendObjectAsync('settings.customAmbilightCommand', {
+            await this.extendObjectAsync('settings.currentAmbilightConfiguration', {
                 type: 'state',
                 common: {
                     role: 'json',
