@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "philips-tv",
-    "version": "0.5.2",
+    "version": "0.5.3",
     "news": {
+      "0.5.3": {
+        "en": "update lib",
+        "de": "aktualisierung lib",
+        "ru": "обновление lib",
+        "pt": "atualização",
+        "nl": "bbbbbb",
+        "fr": "update lib",
+        "it": "aggiornamento lib",
+        "es": "lib",
+        "pl": "aktualizacja",
+        "uk": "оновлення lib",
+        "zh-cn": "最新资料"
+      },
       "0.5.2": {
         "en": "* we renamed `customAmbilightCommand` to `currentAmbilightConfiguration` and update the state on polling (closes #431)\nPlease delete `customAmbilightCommand` manually",
         "de": "* wir umbenannt benutzerdefinierteAmbilight Befehl zur aktuellenAmbilightKonfiguration und Aktualisierung des Zustands bei der Umfrage (schließt #431)\nBitte löschen Sie customAmbilight Befehl manuell",
@@ -67,18 +80,6 @@
         "zh-cn": "f 固定建筑"
       },
       "0.4.3": {
-        "en": "try to fix `ESOCKETTIMEDOUT`",
-        "de": "versuchen, ESOCKETTIMEDOUT zu beheben",
-        "ru": "попробуйте исправить ESOCKETTIMEDOUT",
-        "pt": "tentar corrigir ESOCKETTIMEDOUT",
-        "nl": "probeer ESOCKETTIMEDOUT",
-        "fr": "essayez de réparer ESOCKETTIMEDOUT",
-        "it": "cercare di risolvere ESOCKETTIMEDOUT",
-        "es": "tratar de arreglar ESOCKETTIMEDOUT",
-        "pl": "próbuje naprawić ESOCKETTIMEDOUT",
-        "zh-cn": "试图确定ESOCKETTIMEDOUT"
-      },
-      "0.4.2": {
         "en": "try to fix `ESOCKETTIMEDOUT`",
         "de": "versuchen, ESOCKETTIMEDOUT zu beheben",
         "ru": "попробуйте исправить ESOCKETTIMEDOUT",
