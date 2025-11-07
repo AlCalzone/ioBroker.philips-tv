@@ -135,6 +135,7 @@
     "extIcon": "https://raw.githubusercontent.com/AlCalzone/ioBroker.philips-tv/master/admin/philips-tv.png",
     "readme": "https://github.com/AlCalzone/ioBroker.philips-tv/blob/master/README.md",
     "loglevel": "info",
+    "tier": 2,
     "mode": "daemon",
     "type": "multimedia",
     "compact": true,
