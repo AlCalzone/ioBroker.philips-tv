@@ -126,7 +126,10 @@
       "philips",
       "android"
     ],
-    "license": "MIT",
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
     "platform": "Javascript/Node.js",
     "main": "build/main.js",
     "icon": "philips-tv.png",
