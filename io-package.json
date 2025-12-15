@@ -128,7 +128,6 @@
     ],
     "license": "MIT",
     "platform": "Javascript/Node.js",
-    "main": "build/main.js",
     "icon": "philips-tv.png",
     "enabled": true,
     "messagebox": true,
