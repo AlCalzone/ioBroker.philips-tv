@@ -16,6 +16,7 @@
   "homepage": "https://github.com/AlCalzone/ioBroker.philips-tv",
   "license": "MIT",
   "keywords": [
+    "ioBroker",
     "tv",
     "philips",
     "android"
