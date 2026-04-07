@@ -18,6 +18,9 @@ The developers of this module are in no way endorsed by or affiliated with Konin
 or any associated subsidiaries, logos or trademarks.
 
 ## Changelog
+
+### **WORK IN PROGRESS**
+- (iobroker-bot) Adapter requires node.js >= 20 now.
 <!--
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**

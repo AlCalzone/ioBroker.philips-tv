@@ -2,7 +2,7 @@
   "name": "iobroker.philips-tv",
   "version": "0.5.4",
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=20.0.0"
   },
   "description": "Adapter to control Philips TVs",
   "author": {
