@@ -69,6 +69,8 @@ Please delete `customAmbilightCommand` manually
 ### 0.1.0
 * (AlCalzone) Initial release
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 MIT License
 
